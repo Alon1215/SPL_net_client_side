@@ -48,4 +48,8 @@ void ClientDB::setBorrowedMap(const std::unordered_map<std::string, std::string>
     ClientDB::borrowedMap = borrowedMap;
 }
 
+void ClientDB::setIsActive(bool isActive) {
+    ClientDB::isActive = isActive;
+}
+
 

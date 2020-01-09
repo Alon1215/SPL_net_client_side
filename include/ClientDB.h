@@ -16,6 +16,8 @@ class ClientDB {
 public:
 
 
+    void setIsActive(bool isActive);
+
     void initialize(std::string& name);
 
     std::vector<std::string> getBooksOfTopic;

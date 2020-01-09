@@ -23,3 +23,23 @@ void Protocol::process_server(std::string &msg) {
 
 
 }
+
+std::vector<std::string> Protocol::input_to_vector(const std::string &str) {
+    std::string word = "";
+    std::vector<std::string> output;
+    for (auto x : str)
+    {
+        if (x == ' ')
+        {
+            std::string newWord = word;
+            output.push_back(word);
+            word = "";
+        }
+        else
+        {
+            word = word + x;
+        }
+    }
+    output.push_back(word);
+    return output;
+}
