@@ -5,7 +5,7 @@
 #include "../include/ServerListenerTask.h"
 using boost::asio::ip::tcp;
 
-ServerListenerTask::ServerListenerTask(ConnectionHandler *handler, std::string name,Protocol *protocol,Database &db):handler(handler),name(name),protocol(protocol),db(db) {}
+ServerListenerTask::ServerListenerTask(ConnectionHandler *handler, std::string name, ClientDB &db):handler(handler),name(name),protocol(protocol),db(db) {}
 
 
 

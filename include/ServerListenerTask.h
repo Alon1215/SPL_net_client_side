@@ -9,18 +9,18 @@
 #include <xf86drmMode.h>
 #include "connectionHandler.h"
 #include "Protocol.h"
-#include "Database.h"
+#include "ClientDB.h"
 
 class ServerListenerTask {
 private:
     ConnectionHandler* handler;
     Protocol* protocol; //TODO: impelmet protocol
-    Database& db;
+    ClientDB& db;
     std::string name;
     bool shouldTerminate;
 
 public:
-    ServerListenerTask(ConnectionHandler *handler, std::string name,Protocol* protocol,Database& db);
+    ServerListenerTask(ConnectionHandler *handler, std::string name,ClientDB& db);
     ServerListenerTask(const ServerListenerTask& other);
     std:: vector <std::string> split(std::string st, std::string delimiter);
     void operator()();

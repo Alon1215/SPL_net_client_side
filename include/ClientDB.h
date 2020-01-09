@@ -9,21 +9,43 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include "Protocol.h"
 
 
 class ClientDB {
 public:
-    ClientDB(std::vector<std::string> &getBooksOfTopic, const std::string &myName,
-             std::unordered_map<std::string, std::vector<std::string>> &myInventory,
-             std::unordered_map<std::string, std::string> &borrowedMap);
+
+
+    void initialize(std::string& name);
 
     std::vector<std::string> getBooksOfTopic;
+
+    bool getIsActive() const;
+
+    const std::vector<std::string> &getGetBooksOfTopic() const;
+
+    void setGetBooksOfTopic(const std::vector<std::string> &getBooksOfTopic);
+
+    const std::string &getMyName() const;
+
+    void setMyName(const std::string &myName);
+
+    const std::unordered_map<std::string, std::vector<std::string>> &getMyInventory() const;
+
+    void setMyInventory(const std::unordered_map<std::string, std::vector<std::string>> &myInventory);
+
+    const std::unordered_map<std::string, std::string> &getBorrowedMap() const;
+
+    void setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap);
 
 
 private:
     std::string myName;
+    bool isActive;
     std::unordered_map<std::string,std::vector<std::string>> myInventory;
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
+    Protocol protocol;
+
 
 };
 
