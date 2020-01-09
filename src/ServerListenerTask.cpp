@@ -3,9 +3,22 @@
 //
 
 #include "../include/ServerListenerTask.h"
+#include "../include/ClientDB.h"
+
 using boost::asio::ip::tcp;
 
-ServerListenerTask::ServerListenerTask(ConnectionHandler *handler, std::string name,Protocol *protocol,Database &db):handler(handler),name(name),protocol(protocol),db(db) {}
+ServerListenerTask::ServerListenerTask(ConnectionHandler *handler, std::string name,ClientDB &db):handler(handler),name(name),db(db) {}
+void ServerListenerTask::operator()() {
+    while(1){ //TODO: change to bool in db
+        std::string inmsg;
+        if(!handler->getLine(inmsg)){
+
+            break;
+
+        }
+
+    }
+}
 
 
 
