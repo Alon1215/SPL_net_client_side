@@ -3,6 +3,7 @@
 #include "../include/connectionHandler.h"
 #include "../include/ClientDB.h"
 #include "../include/ServerListenerTask.h"
+#include "../include/Protocol.h"
 
 std::vector<std::string> input_to_vector(const std::string& basicString);
 
@@ -23,7 +24,7 @@ int main () {
     //handle the login (first command):
     std::string input_string;
     getline(std::cin,input_string);
-    std::vector<std::string> vector_for_input = input_to_vector(input_string); //ass method to parse the input
+    std::vector<std::string> vector_for_input = std::string input_to_vector(input_string); //ass method to parse the input
 
     while (vector_for_input.size() == 0 || vector_for_input.at(0) != "login"){
         printf("ERROR: user is not logged in yet \ntry again: \n");
@@ -46,7 +47,8 @@ int main () {
         i++;
     }
     port = (short) std::stoi(tmpPort); //converting the string to int, and casted to short (assump: valid input)
-    std::string password = vector_for_input.at(2);
+    std::string myName = vector_for_input.at(2);
+    std::string password = vector_for_input.at(3);
 
     //creating connection with server:
     ConnectionHandler connectionHandler(host, port);
@@ -55,7 +57,7 @@ int main () {
         return 1;
     }
     //Thread (new Task(connectionHandler, name, password));
-    ServerListenerTask serverListenerTask()
+    ServerListenerTask serverListenerTask(&connectionHandler,myName,clientDb);
     std::thread th1(&ServerListenerTask::run, &serverListenerTask);
 
 
@@ -121,25 +123,25 @@ int main () {
     return 0;
 }
 
-std::vector<std::string> input_to_vector(const std::string& str) {
-    std::string word = "";
-    std::vector<std::string> output;
-    for (auto x : str)
-    {
-        if (x == ' ')
-        {
-            std::string newWord = word;
-            output.push_back(word);
-            word = "";
-        }
-        else
-        {
-            word = word + x;
-        }
-    }
-    output.push_back(word);
-    return output;
-}
+//std::vector<std::string> input_to_vector(const std::string& str) {
+//    std::string word = "";
+//    std::vector<std::string> output;
+//    for (auto x : str)
+//    {
+//        if (x == ' ')
+//        {
+//            std::string newWord = word;
+//            output.push_back(word);
+//            word = "";
+//        }
+//        else
+//        {
+//            word = word + x;
+//        }
+//    }
+//    output.push_back(word);
+//    return output;
+//}
 
 //
 //static std::vector<std::string> input_to_vector(const std::string& str) {
