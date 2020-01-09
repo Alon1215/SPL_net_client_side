@@ -9,13 +9,14 @@ using boost::asio::ip::tcp;
 
 ServerListenerTask::ServerListenerTask(ConnectionHandler *handler, std::string name,ClientDB &db):handler(handler),name(name),db(db) {}
 void ServerListenerTask::operator()() {
-    while(1){ //TODO: change to bool in db
+    while(db.getIsActive()){ //TODO: change to bool in db
         std::string inmsg;
         if(!handler->getLine(inmsg)){
-
+            db.setIsActive(false);
             break;
-
         }
+
+
 
     }
 }

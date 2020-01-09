@@ -38,6 +38,8 @@ public:
 
     void setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap);
 
+    void setIsActive(bool isActive);
+
 
 private:
     std::string myName;

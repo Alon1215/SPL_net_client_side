@@ -6,7 +6,13 @@
 #define SPL_NET_CLIENT_PROTOCOL_H
 
 
+#include <string>
+
 class Protocol {
+
+public:
+    void process_server(std::string msg);
+    void process_keyboard(std::string msg);
 
 };
 

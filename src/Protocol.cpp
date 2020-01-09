@@ -3,3 +3,14 @@
 //
 
 #include "../include/Protocol.h"
+
+
+
+void Protocol::process_keyboard(std::string msg) {
+
+}
+
+void Protocol::process_server(std::string msg) {
+
+
+}

@@ -12,6 +12,10 @@ bool ClientDB::getIsActive() const {
     return isActive;
 }
 
+void ClientDB::setIsActive(bool isActive) {
+    ClientDB::isActive = isActive;
+}
+
 const std::vector<std::string> &ClientDB::getGetBooksOfTopic() const {
     return getBooksOfTopic;
 }
