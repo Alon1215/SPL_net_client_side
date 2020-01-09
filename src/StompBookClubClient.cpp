@@ -24,7 +24,8 @@ int main () {
     //handle the login (first command):
     std::string input_string;
     getline(std::cin,input_string);
-    std::vector<std::string> vector_for_input = std::string input_to_vector(input_string); //ass method to parse the input
+    Protocol protocol;
+    std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
 
     while (vector_for_input.size() == 0 || vector_for_input.at(0) != "login"){
         printf("ERROR: user is not logged in yet \ntry again: \n");
