@@ -18,5 +18,5 @@ public:
 
 };
 
-
+//
 #endif //SPL_NET_CLIENT_PROTOCOL_H
