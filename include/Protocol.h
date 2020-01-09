@@ -12,8 +12,8 @@
 class Protocol {
 
 public:
-    void process_server(std::string msg);
-    void process_keyboard(std::string msg);
+    void process_server(std::string &msg);
+    void process_keyboard(std::string &msg);
     static std::vector<std::string> input_to_vector(const std::string& str);
 
 };
