@@ -8,14 +8,6 @@ std::vector<std::string> input_to_vector(const std::string& basicString);
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 */
 int main () {
-//    if (argc < 3) {
-//        std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
-//        return -1;
-//    }
-//    std::string host = argv[1];
-//    short port = atoi(argv[2]);
-//
-//    ConnectionHandler connectionHandler(host, port);  //TODO: Alon not relevant for our ass
 
     const short bufsize = 1024;
     char buf[bufsize];
@@ -26,11 +18,15 @@ int main () {
     //handle the login (first command):
     std::string input_string;
     getline(std::cin,input_string);
-    std::vector<std::string> vector_for_input =  input_to_vector(input_string); //ass method to parse the input
+    std::vector<std::string> vector_for_input = input_to_vector(input_string); //ass method to parse the input
 
+    while (vector_for_input.size() == 0 || vector_for_input.at(0) != "login"){
+        printf("ERROR: user is not logged in yet \ntry again: \n");
+        getline(std::cin,input_string);
+        vector_for_input = input_to_vector(input_string); //assistant method to parse the input to vector
+     }
 
-    //TODO: ALON 8.1 2130 : assuming login is first input, not sure if right
-    std::string password =
+    //at this point, a login command is received
     std::string host = "";
     std::string tmpPort = "";
     short port;
@@ -45,7 +41,19 @@ int main () {
         i++;
     }
     port = (short) std::stoi(tmpPort); //converting the string to int, and casted to short (assump: valid input)
-    //at this
+    std::string password = vector_for_input.at(2);
+
+    //creating connection with server:
+    ConnectionHandler connectionHandler(host, port);
+    if (!connectionHandler.connect()) {
+        std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
+        return 1;
+    }
+
+
+
+
+
 
 
 
