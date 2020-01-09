@@ -4,8 +4,44 @@
 
 #include "../include/ClientDB.h"
 
-ClientDB::ClientDB(std::vector<std::string> &getBooksOfTopic, const std::string &myName,
-                   std::unordered_map<std::string, std::vector<std::string>> &myInventory,
-                   std::unordered_map<std::string, std::string> &borrowedMap) {
 
+
+
+
+bool ClientDB::getIsActive() const {
+    return isActive;
 }
+
+const std::vector<std::string> &ClientDB::getGetBooksOfTopic() const {
+    return getBooksOfTopic;
+}
+
+void ClientDB::setGetBooksOfTopic(const std::vector<std::string> &getBooksOfTopic) {
+    ClientDB::getBooksOfTopic = getBooksOfTopic;
+}
+
+const std::string &ClientDB::getMyName() const {
+    return myName;
+}
+
+void ClientDB::setMyName(const std::string &myName) {
+    ClientDB::myName = myName;
+}
+
+const std::unordered_map<std::string, std::vector<std::string>> &ClientDB::getMyInventory() const {
+    return myInventory;
+}
+
+void ClientDB::setMyInventory(const std::unordered_map<std::string, std::vector<std::string>> &myInventory) {
+    ClientDB::myInventory = myInventory;
+}
+
+const std::unordered_map<std::string, std::string> &ClientDB::getBorrowedMap() const {
+    return borrowedMap;
+}
+
+void ClientDB::setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap) {
+    ClientDB::borrowedMap = borrowedMap;
+}
+
+

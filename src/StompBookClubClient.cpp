@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <thread>
 #include "../include/connectionHandler.h"
 #include "../include/ClientDB.h"
+#include "../include/ServerListenerTask.h"
 
 std::vector<std::string> input_to_vector(const std::string& basicString);
 
@@ -11,9 +13,12 @@ int main () {
 
     const short bufsize = 1024;
     char buf[bufsize];
-    std::cin.getline(buf, bufsize);
-    std::string line(buf);
-    int len =line.length();
+    ClientDB clientDb;
+    //ConnectionHandler* connectionHandler;
+
+//    std::cin.getline(buf, bufsize);
+//    std::string line(buf);
+//    int len =line.length();//TODO: is relevant? not to delete at the moment
 
     //handle the login (first command):
     std::string input_string;
@@ -49,6 +54,10 @@ int main () {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
         return 1;
     }
+    //Thread (new Task(connectionHandler, name, password));
+    ServerListenerTask serverListenerTask()
+    std::thread th1(&ServerListenerTask::run, &serverListenerTask);
+
 
 
 
