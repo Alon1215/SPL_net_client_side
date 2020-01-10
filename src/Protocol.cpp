@@ -9,7 +9,9 @@
 #include <boost/algorithm/string.hpp>
 
 enum string_code{
-    connected,receipt,message
+    connected,receipt,message,
+    disconnect,subscribe,unsubscribe, //receipt cases
+    returning, bookstatus,taking,someone_has,someone_wish,someone_added
 };
 Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): datab(db) ,handler(handler) {}
 
@@ -27,6 +29,10 @@ void Protocol::process_server(std::string &msg) {
         case connected:
             datab.setIsActive(true);
             std::cout << "Successfully connected to Server!..\n" << std::endl;
+            break;
+        case message:
+            std::string message
+            }
 
             break;
         case receipt:
@@ -34,15 +40,22 @@ void Protocol::process_server(std::string &msg) {
             boost::split(receipt,result.at(1),boost::is_any_of(":"));
             int receiptnum = stoi(receipt.at(1)); //get receipt number
             std::vector<std::string> missioninfo = datab.getReceiptMap().at(receiptnum);
-
-
-
-            break;
-        case message:
-            break;
-        default:
-            break;
-
+            int opcode2 = getOpcode(missioninfo.at(0)); //get the type of my receipt message
+            switch(opcode2){
+                case disconnect:
+                    datab.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
+                    handler.close(); //close the socket
+                    std::cout << "Successful logout from Server!..\n" << std::endl;
+                    break;
+                case subscribe:
+                    std::cout << "Joined club "
+                              << missioninfo.at(1)  << std::endl;
+                    break;
+                case unsubscribe:
+                    std::cout << "Exited club "
+                              << missioninfo.at(1)  << std::endl;
+                    break;
+            }
     }
 
 
@@ -77,7 +90,20 @@ int Protocol::getOpcode(std::string st) {
         return receipt;
     if(st=="MESSAGE")
         return message;
-    return 0;
+    if(st=="DISCONNECT")
+        return disconnect;
+    if(st=="SUBSCCRIBE")
+        return subscribe;
+    if(st=="UNSUBSCRIBE")
+        return unsubscribe;
+    if(st=="BOOK")
+        return bookstatus;
+    if(st=="RETURNING")
+        return returning;
+    if(st=="TAKING")
+        return taking;
+
+    return -1;
 
 }
 

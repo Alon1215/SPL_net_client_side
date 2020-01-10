@@ -51,6 +51,8 @@ private:
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
     std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (messageType,topic, etc....)
     Protocol protocol; //TODO:Ofer: why?
+    int receiptnumcounter=0; //this wil be a unique number of each receipt
+    int subscriptionid=0; //TODO: Ofer:should this be unique just for each client or for all users (i ithink for all)
 
 
 

@@ -52,9 +52,11 @@ public:
 
     }
 
-    const std::unordered_map<std::string, std::string> &ClientDB::getReceiptMap() const {
-        return receiptMap;
-    }
+const std::unordered_map<int, std::vector<std::string>> &ClientDB::getReceiptMap() const {
+    return receiptMap;
+}
+
+
 
 
 
