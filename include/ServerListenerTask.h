@@ -6,7 +6,6 @@
 #define SPL_NET_CLIENT_SERVERLISTENERTASK_H
 
 
-#include <xf86drmMode.h>
 #include "connectionHandler.h"
 #include "Protocol.h"
 #include "ClientDB.h"

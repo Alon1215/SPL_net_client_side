@@ -8,13 +8,24 @@
 
 #include <string>
 #include <vector>
+#include "ClientDB.h"
+#include "connectionHandler.h"
 
 class Protocol {
+private:
+
+
+    ClientDB& datab;
+    ConnectionHandler& handler;
+    static int getOpcode(std::string st);
+
 
 public:
+    Protocol(ClientDB &db, ConnectionHandler &handler);
     void process_server(std::string &msg);
     void process_keyboard(std::string &msg);
     static std::vector<std::string> input_to_vector(const std::string& str);
+
 
 };
 

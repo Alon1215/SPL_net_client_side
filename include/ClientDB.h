@@ -15,6 +15,7 @@
 class ClientDB {
 public:
 
+    const std::unordered_map<int, std::vector<std::string>> &getReceiptMap() const;
 
     void setIsActive(bool isActive);
 
@@ -40,7 +41,7 @@ public:
 
     void setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap);
 
-    void setIsActive(bool isActive);
+
 
 
 private:
@@ -48,7 +49,9 @@ private:
     bool isActive;
     std::unordered_map<std::string,std::vector<std::string>> myInventory;
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
-    Protocol protocol;
+    std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (messageType,topic, etc....)
+    Protocol protocol; //TODO:Ofer: why?
+
 
 
 };

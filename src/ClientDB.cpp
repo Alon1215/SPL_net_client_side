@@ -6,50 +6,55 @@
 
 
 
+public:
 
+    bool ClientDB::getIsActive() const {
+        return isActive;
+    }
 
-bool ClientDB::getIsActive() const {
-    return isActive;
-}
+    void ClientDB::setIsActive(bool isActive) {
+        ClientDB::isActive = isActive;
+    }
 
-void ClientDB::setIsActive(bool isActive) {
-    ClientDB::isActive = isActive;
-}
+    const std::vector<std::string> &ClientDB::getGetBooksOfTopic() const {
+        return getBooksOfTopic;
+    }
 
-const std::vector<std::string> &ClientDB::getGetBooksOfTopic() const {
-    return getBooksOfTopic;
-}
+    void ClientDB::setGetBooksOfTopic(const std::vector<std::string> &getBooksOfTopic) {
+        ClientDB::getBooksOfTopic = getBooksOfTopic;
+    }
 
-void ClientDB::setGetBooksOfTopic(const std::vector<std::string> &getBooksOfTopic) {
-    ClientDB::getBooksOfTopic = getBooksOfTopic;
-}
+    const std::string &ClientDB::getMyName() const {
+        return myName;
+    }
 
-const std::string &ClientDB::getMyName() const {
-    return myName;
-}
+    void ClientDB::setMyName(const std::string &myName) {
+        ClientDB::myName = myName;
+    }
 
-void ClientDB::setMyName(const std::string &myName) {
-    ClientDB::myName = myName;
-}
+    const std::unordered_map<std::string, std::vector<std::string>> &ClientDB::getMyInventory() const {
+        return myInventory;
+    }
 
-const std::unordered_map<std::string, std::vector<std::string>> &ClientDB::getMyInventory() const {
-    return myInventory;
-}
+    void ClientDB::setMyInventory(const std::unordered_map<std::string, std::vector<std::string>> &myInventory) {
+        ClientDB::myInventory = myInventory;
+    }
 
-void ClientDB::setMyInventory(const std::unordered_map<std::string, std::vector<std::string>> &myInventory) {
-    ClientDB::myInventory = myInventory;
-}
+    const std::unordered_map<std::string, std::string> &ClientDB::getBorrowedMap() const {
+        return borrowedMap;
+    }
 
-const std::unordered_map<std::string, std::string> &ClientDB::getBorrowedMap() const {
-    return borrowedMap;
-}
+    void ClientDB::setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap) {
+        ClientDB::borrowedMap = borrowedMap;
+    }
 
-void ClientDB::setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap) {
-    ClientDB::borrowedMap = borrowedMap;
-}
+    void ClientDB::initialize(std::string &name) {
 
-void ClientDB::setIsActive(bool isActive) {
-    ClientDB::isActive = isActive;
-}
+    }
+
+    const std::unordered_map<std::string, std::string> &ClientDB::getReceiptMap() const {
+        return receiptMap;
+    }
+
 
 
