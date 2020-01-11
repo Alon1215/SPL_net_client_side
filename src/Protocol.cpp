@@ -13,7 +13,7 @@ enum string_code{
     disconnect,subscribe,unsubscribe, //receipt cases
     returning, bookstatus,taking,someone_has,someone_wish,someone_added
 };
-Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): datab(db) ,handler(handler) {}
+Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler(handler) {}
 
 
 
@@ -27,7 +27,7 @@ void Protocol::process_server(std::string &msg) {
     int opcode = getOpcode(result.at(0));
     switch(opcode) {
         case connected:
-            datab.setIsActive(true);
+            myDB.setIsActive(true);
             std::cout << "Successfully connected to Server!..\n" << std::endl;
             break;
         case message:
@@ -39,11 +39,11 @@ void Protocol::process_server(std::string &msg) {
             std::vector<std::string> receipt;
             boost::split(receipt,result.at(1),boost::is_any_of(":"));
             int receiptnum = stoi(receipt.at(1)); //get receipt number
-            std::vector<std::string> missioninfo = datab.getReceiptMap().at(receiptnum);
+            std::vector<std::string> missioninfo = myDB.getReceiptMap().at(receiptnum);
             int opcode2 = getOpcode(missioninfo.at(0)); //get the type of my receipt message
             switch(opcode2){
                 case disconnect:
-                    datab.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
+                    myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
                     handler.close(); //close the socket
                     std::cout << "Successful logout from Server!..\n" << std::endl;
                     break;
@@ -60,6 +60,27 @@ void Protocol::process_server(std::string &msg) {
 
 
 
+}
+
+
+std::vector<std::string> Protocol::input_to_vector(const std::string &str, char delimiter) {
+    std::string word = "";
+    std::vector<std::string> output;
+    for (auto x : str)
+    {
+        if (x == delimiter)
+        {
+            std::string newWord = word;
+            output.push_back(word);
+            word = "";
+        }
+        else
+        {
+            word = word + x;
+        }
+    }
+    output.push_back(word);
+    return output;
 }
 
 
