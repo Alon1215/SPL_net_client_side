@@ -41,19 +41,19 @@ public:
 
     void setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap);
 
-///
+//
 
 
 private:
-    int subscriptionID; //TODO: added to identify my unique sub's id. check if more similar feilds are needed
+    bool isShouldTerminate;
     std::string myName;
     bool isActive;
-    std::unordered_map<std::string,std::vector<std::string>> myInventory;
+    std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd =
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
     std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (messageType,topic, etc....)
     Protocol protocol; //TODO:Ofer: why?
-    int receiptnumcounter=0; //this wil be a unique number of each receipt
-    int subscriptionid=0; //TODO: Ofer:should this be unique just for each client or for all users (i ithink for all)
+    int receiptnumcounter; //this wil be a unique number of each receipt
+    int subscriptionid; //TODO: Ofer:should this be unique just for each client or for all users (i ithink for all)
 
 
 
