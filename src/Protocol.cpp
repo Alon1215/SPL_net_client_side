@@ -50,8 +50,12 @@ void Protocol::process_server(std::string &msg) {
             switch(opcode2) {
                 case taking:
                     if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
-
-
+                        book = parse_vec.at(1);
+                        boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
+                        topic = parse_vec.at(1);
+                        if(myDB.remove_book_from_Inv(book,topic)){
+                            std::cout << "Borrowed " <<book <<  std::endl;
+                        }
                     }
 
                     break;
@@ -106,9 +110,6 @@ void Protocol::process_server(std::string &msg) {
                     }
 
             }
-
-
-
 
             break;
         case receipt:
