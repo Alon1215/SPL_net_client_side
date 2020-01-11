@@ -17,6 +17,7 @@ private:
     ConnectionHandler& handler;
     int getOpcode(std::string st);
 
+
 public:
     Protocol(ClientDB &db, ConnectionHandler &handler);
     void process_server(std::string &msg);

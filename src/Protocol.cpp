@@ -27,6 +27,9 @@ void Protocol::process_server(std::string &msg) {
     std::vector<std::string> result; //vector of all lines in input msg
     std::vector<std::string> parse_vec;
     std::vector<std::string> mission_info;
+    std::vector<std::string> books;
+    std::string topic;
+    std::string body;
     int opcode2;
     int receipt_num;
     boost::split(result, msg, boost::is_any_of("\n"));
@@ -39,9 +42,9 @@ void Protocol::process_server(std::string &msg) {
         case message:
             boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
             opcode2=getOpcode(parse_vec.at(0)); //get first word code
-            switch(opcode2){
+            switch(opcode2) {
                 case taking:
-                    if(parse_vec.at(3) == myDB.getMyName()){ //need to give a book
+                    if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
 
 
                     }
@@ -49,14 +52,22 @@ void Protocol::process_server(std::string &msg) {
                     break;
 
                 case bookstatus:
+                    body = myDB.getMyName() + ":";
+                    boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
+                    topic = parse_vec.at(1);
+                    books = myDB.getMyInventory().at(topic);
+                    for (std::string book: books)
+                        body = body + book + ",";
 
-
+                    send(topic, body);//send frame
+                    std::cout << body << std::endl; //print status
                     break;
                 case returning:
                     break;
                 default:
-
+                    break;
             }
+
 
 
 
@@ -165,8 +176,9 @@ int Protocol::getOpcode(std::string st) {
 }
 
 void Protocol::send(std::string topic, std::string body) {
-
-
+    std::string toSend;
+    toSend="SEND\n destination:" + topic + "\n\n" + body + "\n\0";
+    handler.sendLine(toSend);
 }
 
 
