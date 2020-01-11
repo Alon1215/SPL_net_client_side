@@ -101,7 +101,6 @@ void Protocol::process_server(std::string &msg) {
                             std::cout << body << std::endl; //print status
                             break;
 
-
                     }
 
             }

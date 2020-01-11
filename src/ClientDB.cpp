@@ -85,9 +85,7 @@ bool ClientDB::remove_book_from_wishList(std::string book,std::string topic) {;
     return false;
 }
 
-const Protocol &ClientDB::getProtocol() const {
-    return protocol;
-}
+
 
 void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
     ClientDB::isShouldTerminate = isShouldTerminate;
@@ -112,6 +110,10 @@ bool ClientDB::wishList_contains(std::string book) {
 
  std::vector<std::string> &ClientDB::getWishList()  {
     return wishList;
+}
+
+const Protocol &ClientDB::getProtocol() const {
+    return protocol;
 }
 
 
