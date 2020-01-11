@@ -4,6 +4,7 @@
 #include "../include/ClientDB.h"
 #include "../include/ServerListenerTask.h"
 #include "../include/Protocol.h"
+#include "../include/KeyboardListenerTask.h"
 
 std::vector<std::string> input_to_vector(const std::string& basicString);
 
@@ -11,92 +12,87 @@ std::vector<std::string> input_to_vector(const std::string& basicString);
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 */
 int main () {
+    while (1) {
+        ClientDB clientDb;
+        Protocol aProtocol = Protocol(); //TODO: ALON 11.12 1610 is right syntax?
+        clientDb.setIsActive(false);
 
-    const short bufsize = 1024;
-    char buf[bufsize];
-    ClientDB clientDb;
-    Protocol *aProtocol = new Protocol;
-    //ConnectionHandler* connectionHandler;
+        //ConnectionHandler* connectionHandler;
 
-//    std::cin.getline(buf, bufsize);
-//    std::string line(buf);
-//    int len =line.length();//TODO: is relevant? not to delete at the moment
+        //handle the login (first command):
+        std::string input_string;
+        getline(std::cin, input_string);
+        std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
+        if (vector_for_input.size() != 0 || vector_for_input.at(0) != "logout"){ break;} //TODO: ALON not sure if right, CHECK
+        while (vector_for_input.size() == 0 || vector_for_input.at(0) != "login") {
+            printf("ERROR: user is not logged in yet \ntry again: \n");
+            getline(std::cin, input_string);
+            vector_for_input = input_to_vector(input_string); //assistant method to parse the input to vector
+        } //TODO: committed only to test something
 
-    //handle the login (first command):
-    std::string input_string;
-    getline(std::cin,input_string);
-    std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
+        //if (vector_for_input.at(0) == "login"){
+//        if (!clientDb.getIsActive()){
+//            printf("ERROR: user already logged\n"); //TODO: need to be replaced to stomp format!
+//        } else{
 
-//    while (vector_for_input.size() == 0 || vector_for_input.at(0) != "login"){
-//        printf("ERROR: user is not logged in yet \ntry again: \n");
-//        getline(std::cin,input_string);
-//        vector_for_input = input_to_vector(input_string); //assistant method to parse the input to vector
-//     } //TODO: committed only to test something
-
-    if (vector_for_input.at(0) == "login"){
-        if (!clientDb.getIsActive()){
-//            "ERROR\n"
-//            "receipt-id: message-12345\n"
-//            "message: malformed frame receivedThe message:\n"
-//            "-----\n"
-//            "MESSAGE\n"
-//            "destined:/queue/a\n"
-//            "receipt: message-12345\n"
-//            "Hello queue a!\n"
-//            "-----\n"
-//            "Did not contain a destination header, which is REQUIRED for message propagation.^@";
-            printf("ERROR: user already logged\n"); //TODO: need to be replaced to stomp format!
-        } else{
-
-            //at this point, a login command is received
-            std::string host;
-            std::string tmpPort;
-            short port;
-            int i = 0;
-            while (vector_for_input.at(1).at(i) != ':'){
-                host += vector_for_input.at(1).at(i);
-                i++;
-            }
+        //at this point, a login command is received
+        std::string host;
+        std::string tmpPort;
+        short port;
+        int i = 0;
+        while (vector_for_input.at(1).at(i) != ':') {
+            host += vector_for_input.at(1).at(i);
             i++;
-            while (i< vector_for_input.at(1).length()){
-                tmpPort += vector_for_input.at(1).at(i);
-                i++;
-            }
-            port = (short) std::stoi(tmpPort); //converting the string to int, and casted to short (assump: valid input)
-            std::string myName = vector_for_input.at(2);
-            std::string password = vector_for_input.at(3);
-            clientDb.setMyName(myName);
+        }
+        i++;
+        while (i < vector_for_input.at(1).length()) {
+            tmpPort += vector_for_input.at(1).at(i);
+            i++;
+        }
+        port = (short) std::stoi(tmpPort); //converting the string to int, and casted to short (assump: valid input)
+        std::string myName = vector_for_input.at(2);
+        std::string password = vector_for_input.at(3);
+        clientDb.setMyName(myName);
 
 
-            //creating connection with server:
-            ConnectionHandler connectionHandler(host, port);
-            if (!connectionHandler.connect()) {
-                //std::cerr << "Cannot connect to " << host << ":" << port << std::endl; //TODO: not sure if relevant
-                printf("Could not connect to server\n");  //TODO: need to be replaced to stomp format!
-            }
+        //creating connection with server:
+        ConnectionHandler connectionHandler(host, port);
+        if (!connectionHandler.connect()) {
+            printf("Could not connect to server\n");  //TODO: need to be replaced to stomp format!
+        } else {
             //Thread (new Task(connectionHandler, name, password));
-            ServerListenerTask serverListenerTask(&connectionHandler,myName,clientDb);
+            ServerListenerTask serverListenerTask(connectionHandler, myName, clientDb);
+            KeyboardListenerTask keyBoardListenerTask(&connectionHandler, myName, clientDb);
             std::thread th1(std::ref(serverListenerTask)); //TODO: Check if ok
 
+            aProtocol.send("CONNECT", "version:1.2\n\n^@"); //TODO: check if ^@ or \0
+            std::thread th2(std::ref(keyBoardListenerTask)); //TODO: Check if ok
+
+            //now client is up and running. waits until logged out:
+            th1.join();
+            th2.join();
         }
+
+
+        //}
+        //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //--------------------------------------------------------------------------------------------
 
     return 0;

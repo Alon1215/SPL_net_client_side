@@ -26,6 +26,7 @@ public:
     static std::vector<std::string> input_to_vector(const std::string& str);
     void send(std::string topic,std::string body);
 
+
 };
 
 //

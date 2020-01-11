@@ -19,9 +19,9 @@ Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler
 
 
 
-void Protocol::process_keyboard(std::string  &msg) {
-
-}
+//void Protocol::process_keyboard(std::string  &msg) {
+//
+//}
 
 void Protocol::process_server(std::string &msg) {
     std::vector<std::string> result; //vector of all lines in input msg
@@ -203,6 +203,13 @@ void Protocol::send(std::string topic, std::string body) {
     std::string toSend;
     toSend="SEND\n destination:" + topic + "\n\n" + body + "\n\0";
     handler.sendLine(toSend);
+}
+
+
+
+void Protocol::process_keyboard(std::string &msg) {
+
+
 }
 
 

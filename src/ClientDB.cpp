@@ -5,9 +5,6 @@
 #include "../include/ClientDB.h"
 
 
-
-public:
-
     bool ClientDB::getIsActive() const {
         return isActive;
     }
@@ -69,6 +66,15 @@ void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
         books.push_back(book); //insert book only if not there already
 
 }
+
+const Protocol &ClientDB::getProtocol() const {
+    return protocol;
+}
+
+void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
+    ClientDB::isShouldTerminate = isShouldTerminate;
+}
+
 
 
 
