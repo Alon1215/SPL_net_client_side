@@ -30,10 +30,6 @@ int main () {
             vector_for_input = input_to_vector(input_string); //assistant method to parse the input to vector
         } //TODO: committed only to test something
 
-        //if (vector_for_input.at(0) == "login"){
-//        if (!clientDb.getIsActive()){
-//            printf("ERROR: user already logged\n"); //TODO: need to be replaced to stomp format!
-//        } else{
 
         //at this point, a login command is received
         std::string host;
@@ -65,7 +61,7 @@ int main () {
             KeyboardListenerTask keyBoardListenerTask(&connectionHandler, myName, clientDb);
             std::thread th1(std::ref(serverListenerTask)); //TODO: Check if ok
 
-            aProtocol.send("CONNECT", "version:1.2\n\n^@"); //TODO: check if ^@ or \0
+            aProtocol.send("CONNECT", "version:1.2"); //TODO: check if ^@ or \0
             std::thread th2(std::ref(keyBoardListenerTask)); //TODO: Check if ok
 
             //now client is up and running. waits until logged out:

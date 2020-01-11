@@ -261,8 +261,10 @@ void Protocol::process_keyboard(std::string &msg) {
                 std::string topic = vector_for_input.at(1);
                 int receiptId = myDB.getRecIdAndInc();
                 int subID = myDB.getSubIdAndInc();
+                std::string body = "destination:" + topic + "\nid:";
+                body += subID + "\nreceipt:" + receiptId;
 
-                send("SUBSCRIBE","destination:" +  + "\nid:" + );
+                send("SUBSCRIBE","destination:" + topic + "\nid:" + subID + "\nreceipt:" + receiptId );
 
 
                 break;
