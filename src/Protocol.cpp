@@ -9,11 +9,13 @@
 #include <boost/algorithm/string.hpp>
 
 enum string_code{
-    connected,receipt,message,
+    connected,receipt,message,error,
     disconnect,subscribe,unsubscribe, //receipt cases
-    returning, bookstatus,taking,someone_has,someone_wish,someone_added
+    returning, bookstatus,taking,someone_has,someone_wish,someone_added   //message cases
 };
-Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler(handler) {}
+Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler(handler) {
+
+}
 
 
 
@@ -22,7 +24,11 @@ void Protocol::process_keyboard(std::string  &msg) {
 }
 
 void Protocol::process_server(std::string &msg) {
-    std::vector<std::string> result;
+    std::vector<std::string> result; //vector of all lines in input msg
+    std::vector<std::string> parse_vec;
+    std::vector<std::string> mission_info;
+    int opcode2;
+    int receipt_num;
     boost::split(result, msg, boost::is_any_of("\n"));
     int opcode = getOpcode(result.at(0));
     switch(opcode) {
@@ -31,16 +37,35 @@ void Protocol::process_server(std::string &msg) {
             std::cout << "Successfully connected to Server!..\n" << std::endl;
             break;
         case message:
-            std::string message
+            boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
+            opcode2=getOpcode(parse_vec.at(0)); //get first word code
+            switch(opcode2){
+                case taking:
+                    if(parse_vec.at(3) == myDB.getMyName()){ //need to give a book
+
+
+                    }
+
+                    break;
+
+                case bookstatus:
+
+
+                    break;
+                case returning:
+                    break;
+                default:
+
             }
+
+
 
             break;
         case receipt:
-            std::vector<std::string> receipt;
-            boost::split(receipt,result.at(1),boost::is_any_of(":"));
-            int receiptnum = stoi(receipt.at(1)); //get receipt number
-            std::vector<std::string> missioninfo = myDB.getReceiptMap().at(receiptnum);
-            int opcode2 = getOpcode(missioninfo.at(0)); //get the type of my receipt message
+            boost::split(parse_vec, result.at(1), boost::is_any_of(":"));
+            receipt_num = stoi(parse_vec.at(1)); //get receipt number
+            mission_info = myDB.getReceiptMap().at(receipt_num);
+            opcode2 = getOpcode(mission_info.at(0)); //get the type of my receipt message
             switch(opcode2){
                 case disconnect:
                     myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
@@ -49,18 +74,27 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 case subscribe:
                     std::cout << "Joined club "
-                              << missioninfo.at(1)  << std::endl;
+                              << mission_info.at(1) << std::endl;
                     break;
                 case unsubscribe:
                     std::cout << "Exited club "
-                              << missioninfo.at(1)  << std::endl;
+                              << mission_info.at(1) << std::endl;
                     break;
             }
+        case error:
+            std::cout << "Error occured \n: "
+                      << msg << std::endl;
+            myDB.setIsActive(false);
+            handler.close();
+
+        default: //TODO: should choose what to do in case invalid msg header recieved
+            break;
     }
 
-
-
 }
+
+
+
 
 
 std::vector<std::string> Protocol::input_to_vector(const std::string &str, char delimiter) {
@@ -123,10 +157,23 @@ int Protocol::getOpcode(std::string st) {
         return returning;
     if(st=="TAKING")
         return taking;
+    if(st=="ERROR")
+        return error;
 
-    return -1;
+    return -1; //invalid msg header
 
 }
+
+void Protocol::send(std::string topic, std::string body) {
+
+
+}
+
+
+
+
+
+
 
 
 

@@ -53,7 +53,7 @@ private:
     std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (messageType,topic, etc....)
     Protocol protocol; //TODO:Ofer: why?
     int receiptnumcounter; //this wil be a unique number of each receipt
-    int subscriptionid; //TODO: Ofer:should this be unique just for each client or for all users (i ithink for all)
+    int subscriptionid; //
 
 
 

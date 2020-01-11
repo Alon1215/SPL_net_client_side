@@ -15,8 +15,8 @@ class Protocol {
 private:
     ClientDB& myDB;
     ConnectionHandler& handler;
-    static int getOpcode(std::string st);
-
+    int getOpcode(std::string st);
+    void send(std::string topic,std::string body);
 
 public:
     Protocol(ClientDB &db, ConnectionHandler &handler);
@@ -24,8 +24,6 @@ public:
     void process_keyboard(std::string &msg);
     static std::vector<std::string> input_to_vector(const std::string& str, char delimiter);
     static std::vector<std::string> input_to_vector(const std::string& str);
-
-
 
 };
 
