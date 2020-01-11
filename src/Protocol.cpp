@@ -11,8 +11,14 @@
 enum string_code{
     connected,receipt,message,error,
     disconnect,subscribe,unsubscribe, //receipt cases
-    returning, bookstatus,taking,someone_has,someone_wish,someone_added   //message cases
+    returning, bookstatus,taking,someone_has,someone_wish,someone_added,   //message cases
+    LOGIN, JOIN, EXIT, ADD_BOOK, BORROW, RETURN, GENRE, LOGOUT //for keyboard
 };
+
+//enum fromKB{
+//    login, join, exit,
+//};
+
 Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler(handler) {
 
 }
@@ -171,6 +177,24 @@ int Protocol::getOpcode(std::string st) {
     if(st=="ERROR")
         return error;
 
+    //for keyboard:
+    if(st=="login")
+        return LOGIN;
+    if(st=="join")
+        return JOIN;
+    if(st=="exit")
+        return EXIT;
+    if(st=="add")
+        return ADD_BOOK;
+    if(st=="borrow")
+        return BORROW;
+    if(st=="return")
+        return RETURN;
+    if(st=="status")
+        return GENRE;
+    if(st=="logout")
+        return LOGOUT;
+
     return -1; //invalid msg header
 
 }
@@ -184,6 +208,51 @@ void Protocol::send(std::string topic, std::string body) {
 
 
 void Protocol::process_keyboard(std::string &msg) {
+
+    std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
+    if (vector_for_input.size() != 0 ){printf("ERROR: invalid input\n");} //test purpose only
+    else{
+        int actionName = getOpcode(vector_for_input.at(0)); //checks first word in input
+        switch(actionName) {
+            case LOGIN:
+                //assumption: already logged in
+                printf("ERROR: Already logged in!\n");//TODO: should be in STOMP format?
+
+                break;
+            case JOIN:
+                std::string topic = vector_for_input.at(1);
+                int receiptId = myDB.getRecIdAndInc();
+                int subID = myDB.getSubIdAndInc();
+                myDB.get
+                send("SUBSCRIBE","destination:" +  + "\nid:" + );
+
+
+                break;
+            case EXIT:
+
+                break;
+            case ADD_BOOK:
+
+                break;
+            case BORROW:
+
+                break;
+            case RETURN:
+
+                break;
+            case GENRE:
+
+                break;
+            case LOGOUT:
+
+                break;
+
+            default: //TODO: should choose what to do in case invalid msg header recieved
+                break;
+        }
+
+
+    }
 
 
 }

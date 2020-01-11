@@ -61,6 +61,31 @@ void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
     ClientDB::isShouldTerminate = isShouldTerminate;
 }
 
+bool ClientDB::getIsShouldTerminate1() const {
+    return isShouldTerminate;
+}
+
+
+
+
+ClientDB::ClientDB(): isShouldTerminate(false), myName(), isActive(false), myInventory(), borrowedMap(), receiptMap(), protocol(),receiptNumCounter(0), subscriptionId(0) {
+    //TODO: REMEMBER TO update due to more fields added
+    //TODO: check if DB holds an instance of protocol
+}
+
+//next 2 method are returning the counter (for each one) and incrementing it:
+
+int ClientDB::getSubIdAndInc() {
+    subscriptionId ++;
+    return subscriptionId - 1;
+}
+
+int ClientDB::getRecIdAndInc() {
+    receiptNumCounter ++;
+    return receiptNumCounter - 1;
+}
+
+
 
 
 

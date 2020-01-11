@@ -43,23 +43,27 @@ public:
 
     const Protocol &getProtocol() const;
 
-//
+    void setIsShouldTerminate(bool isShouldTerminate);
 
+    bool getIsShouldTerminate1() const;
+
+    int getSubIdAndInc();
+
+    int getRecIdAndInc();
+
+    ClientDB();
 
 private:
     bool isShouldTerminate;
-public:
-    void setIsShouldTerminate(bool isShouldTerminate);
-
-private:
     std::string myName;
     bool isActive;
     std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd =
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
     std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (messageType,topic, etc....)
     Protocol protocol;
-    int receiptnumcounter; //this wil be a unique number of each receipt
-    int subscriptionid;
+    int receiptNumCounter; //this wil be a unique number of each receipt
+    int subscriptionId;
+
 
 };
 
