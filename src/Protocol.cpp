@@ -247,6 +247,13 @@ void Protocol::send(std::string topic, std::string body) {
 
 void Protocol::process_keyboard(std::string &msg) {
 
+    ////////////////
+    std::string topic ;
+    int receiptId ;
+    int subID ;
+    std::string body;
+    /////////////
+
     std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
     if (vector_for_input.size() != 0 ){printf("ERROR: invalid input\n");} //test purpose only
     else{
@@ -258,10 +265,9 @@ void Protocol::process_keyboard(std::string &msg) {
 
                 break;
             case JOIN:
-                std::string topic = vector_for_input.at(1);
-                int receiptId = myDB.getRecIdAndInc();
-                int subID = myDB.getSubIdAndInc();
-                std::string body = "destination:" + topic + "\nid:";
+                topic = vector_for_input.at(1);
+                receiptId = myDB.getRecIdAndInc();
+                subID = myDB.getSubIdAndInc();body = "destination:" + topic + "\nid:";
                 body += subID + "\nreceipt:" + receiptId;
 
                 send("SUBSCRIBE","destination:" + topic + "\nid:" + subID + "\nreceipt:" + receiptId );
