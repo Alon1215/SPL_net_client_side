@@ -5,9 +5,6 @@
 #include "../include/ClientDB.h"
 
 
-
-public:
-
     bool ClientDB::getIsActive() const {
         return isActive;
     }
@@ -55,6 +52,15 @@ public:
 const std::unordered_map<int, std::vector<std::string>> &ClientDB::getReceiptMap() const {
     return receiptMap;
 }
+
+const Protocol &ClientDB::getProtocol() const {
+    return protocol;
+}
+
+void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
+    ClientDB::isShouldTerminate = isShouldTerminate;
+}
+
 
 
 

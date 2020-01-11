@@ -19,9 +19,9 @@ Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler
 
 
 
-void Protocol::process_keyboard(std::string  &msg) {
-
-}
+//void Protocol::process_keyboard(std::string  &msg) {
+//
+//}
 
 void Protocol::process_server(std::string &msg) {
     std::vector<std::string> result; //vector of all lines in input msg
@@ -165,6 +165,13 @@ int Protocol::getOpcode(std::string st) {
 }
 
 void Protocol::send(std::string topic, std::string body) {
+
+
+}
+
+
+
+void Protocol::process_keyboard(std::string &msg) {
 
 
 }
