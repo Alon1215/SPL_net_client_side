@@ -20,7 +20,7 @@ Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler
 
 
 //void Protocol::process_keyboard(std::string  &msg) {
-//
+
 //}
 
 void Protocol::process_server(std::string &msg) {
@@ -31,8 +31,8 @@ void Protocol::process_server(std::string &msg) {
     std::string book;
     std::string topic;
     std::string body;
-
     int receipt_num;
+    std::string other_name;
     boost::split(result, msg, boost::is_any_of("\n"));
     int opcode = getOpcode(result.at(0));
     int opcode2;
@@ -48,7 +48,7 @@ void Protocol::process_server(std::string &msg) {
             switch(opcode2) {
                 case taking:
                     if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
-
+                        //TODO: implement
 
                     }
 
@@ -63,7 +63,6 @@ void Protocol::process_server(std::string &msg) {
                         body = body + book + ",";
 
                     send(topic, body);//send frame
-                    std::cout << body << std::endl; //print status
                     break;
                 case returning:
                     if(parse_vec.size()>=4 && parse_vec.at(3) ==myDB.getMyName()){ //if book is being returned to me
@@ -75,12 +74,31 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 default:
                     opcode3 = getOpcode(parse_vec.at(1));
+                    book = parse_vec.at(4); //TODO:maybe move back to avoid double code
                     switch (opcode3){
                         case wish:
+
+
+                            if(myDB.inv_contains_book(book,topic)){
+                                send(topic,myDB.getMyName()+" has "+book); //if i have this book send has frame
+                            }
                             break;
                         case has:
+                            other_name = parse_vec.at(0);
+                            if(myDB.getMyName()!=other_name){ //act only if this isn't my message
+                                boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic //TODO:check that this wont change book variable value
+                                topic = parse_vec.at(1);
+                                if(myDB.wishList_contains(book)){
+                                    myDB.remove_book_from_wishList(book,topic);
+                                    myDB.add_book_to_Inv(book,topic); //add the loaned book
+                                    myDB.getBorrowedMap().insert(book,other_name); //add borrower to borrow map
+                                    send(topic,"Taking "+book+" from "+ other_name);
+                                }
+                            }
                             break;
-                        default:
+                        default: // someone sent me a book status, i shall print it!
+                            body = result.at(5);
+                            std::cout << body << std::endl; //print status
                             break;
 
 
@@ -100,6 +118,7 @@ void Protocol::process_server(std::string &msg) {
             switch(opcode2){
                 case disconnect:
                     myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
+                    myDB.setIsShouldTerminate(true);
                     handler.close(); //close the socket
                     std::cout << "Successful logout from Server!..\n" << std::endl;
                     break;

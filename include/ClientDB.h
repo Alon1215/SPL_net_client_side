@@ -13,6 +13,20 @@
 
 
 class ClientDB {
+
+private:
+    bool isActive;
+    std::vector<std::string> wishList;
+    std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd =
+    std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
+    std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (first cell = type of msg (disconnect,subscribe,...) second= topic (if needed)
+    Protocol protocol;
+    int receiptnumcounter; //this wil be a unique number of each receipt
+    int subscriptionid;
+    bool remove_book_from_Inv(std::string book, std::string topic);
+    bool isShouldTerminate;
+    std::string myName;
+
 public:
 
     const std::unordered_map<int, std::vector<std::string>> &getReceiptMap() const;
@@ -37,33 +51,16 @@ public:
 
     void setMyInventory(const std::unordered_map<std::string, std::vector<std::string>> &myInventory);
 
-    const std::unordered_map<std::string, std::string> &getBorrowedMap() const;
+     std::unordered_map<std::string, std::string> &getBorrowedMap() ;
 
     void setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap);
     void add_book_to_Inv(std::string book,std::string topic);
-
-
-
+    bool inv_contains_book(std::string book, std::string topic)
     const Protocol &getProtocol() const;
-
-//
-
-
-private:
-    bool isShouldTerminate;
-public:
+     bool wishList_contains(std::string book);
+    std::vector<std::string> &getWishList() ;
     void setIsShouldTerminate(bool isShouldTerminate);
-
-private:
-    std::string myName;
-    bool isActive;
-    std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd =
-    std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
-    std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (messageType,topic, etc....)
-    Protocol protocol;
-    int receiptnumcounter; //this wil be a unique number of each receipt
-    int subscriptionid;
-
+    bool remove_book_from_wishList(std::string book, std::string topic);
 };
 
 
