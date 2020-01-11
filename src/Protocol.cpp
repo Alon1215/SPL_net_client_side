@@ -11,7 +11,7 @@
 enum string_code{
     connected,receipt,message,error,
     disconnect,subscribe,unsubscribe, //receipt cases
-    returning, bookstatus,taking,someone_has,someone_wish,someone_added   //message cases
+    returning, bookstatus,taking,has,wish   //message cases
 };
 Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler(handler) {
 
@@ -28,12 +28,15 @@ void Protocol::process_server(std::string &msg) {
     std::vector<std::string> parse_vec;
     std::vector<std::string> mission_info;
     std::vector<std::string> books;
+    std::string book;
     std::string topic;
     std::string body;
-    int opcode2;
+
     int receipt_num;
     boost::split(result, msg, boost::is_any_of("\n"));
     int opcode = getOpcode(result.at(0));
+    int opcode2;
+    int opcode3;
     switch(opcode) {
         case connected:
             myDB.setIsActive(true);
@@ -63,9 +66,26 @@ void Protocol::process_server(std::string &msg) {
                     std::cout << body << std::endl; //print status
                     break;
                 case returning:
+                    if(parse_vec.size()>=4 && parse_vec.at(3) ==myDB.getMyName()){ //if book is being returned to me
+                        book = parse_vec.at(1);
+                        boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic //TODO:check that this wont change book variable value
+                        topic = parse_vec.at(1);
+                        myDB.add_book_to_Inv(book,topic); //take book back to inv
+                    }
                     break;
                 default:
-                    break;
+                    opcode3 = getOpcode(parse_vec.at(1));
+                    switch (opcode3){
+                        case wish:
+                            break;
+                        case has:
+                            break;
+                        default:
+                            break;
+
+
+                    }
+
             }
 
 
@@ -170,6 +190,10 @@ int Protocol::getOpcode(std::string st) {
         return taking;
     if(st=="ERROR")
         return error;
+    if(st=="wish")
+        return wish;
+    if(st=="has")
+        return has;
 
     return -1; //invalid msg header
 

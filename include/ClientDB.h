@@ -40,6 +40,9 @@ public:
     const std::unordered_map<std::string, std::string> &getBorrowedMap() const;
 
     void setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap);
+    void add_book_to_Inv(std::string book,std::string topic);
+
+
 
 //
 

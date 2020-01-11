@@ -56,6 +56,20 @@ const std::unordered_map<int, std::vector<std::string>> &ClientDB::getReceiptMap
     return receiptMap;
 }
 
+void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
+    std::vector<std::string> books = myInventory.at(topic);
+    bool found=false;
+    for(std::string b : books){
+        if(book.compare(b)==0){
+            found=true;
+            break;
+        }
+    }
+    if(!found)
+        books.push_back(book); //insert book only if not there already
+
+}
+
 
 
 
