@@ -65,6 +65,7 @@ int main () {
             port = (short) std::stoi(tmpPort); //converting the string to int, and casted to short (assump: valid input)
             std::string myName = vector_for_input.at(2);
             std::string password = vector_for_input.at(3);
+            clientDb.setMyName(myName);
 
 
             //creating connection with server:

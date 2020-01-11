@@ -45,6 +45,7 @@ public:
 
 
 private:
+    int subscriptionID; //TODO: added to identify my unique sub's id. check if more similar feilds are needed
     std::string myName;
     bool isActive;
     std::unordered_map<std::string,std::vector<std::string>> myInventory;
