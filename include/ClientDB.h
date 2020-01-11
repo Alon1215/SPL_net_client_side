@@ -21,14 +21,13 @@ private:
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
     std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (first cell = type of msg (disconnect,subscribe,...) second= topic (if needed)
     Protocol protocol;
-    int receiptnumcounter; //this wil be a unique number of each receipt
-    int subscriptionid;
-    bool remove_book_from_Inv(std::string book, std::string topic);
     bool isShouldTerminate;
     std::string myName;
+    int receiptNumCounter; //this wil be a unique number of each receipt
+    int subscriptionId;
 
 public:
-
+    bool remove_book_from_Inv(std::string book, std::string topic);
     const std::unordered_map<int, std::vector<std::string>> &getReceiptMap() const;
 
     void setIsActive(bool isActive);
@@ -74,17 +73,6 @@ public:
     int getRecIdAndInc();
 
     ClientDB();
-
-private:
-    bool isShouldTerminate;
-    std::string myName;
-    bool isActive;
-    std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd =
-    std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
-    std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (messageType,topic, etc....)
-    Protocol protocol;
-    int receiptNumCounter; //this wil be a unique number of each receipt
-    int subscriptionId;
 
 
 };
