@@ -37,7 +37,7 @@
         ClientDB::myInventory = myInventory;
     }
 
-    const std::unordered_map<std::string, std::string> &ClientDB::getBorrowedMap() const {
+    std::unordered_map<std::string, std::string> &ClientDB::getBorrowedMap()  {
         return borrowedMap;
     }
 
@@ -51,6 +51,38 @@
 
 const std::unordered_map<int, std::vector<std::string>> &ClientDB::getReceiptMap() const {
     return receiptMap;
+}
+
+void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
+    std::vector<std::string> books = myInventory.at(topic);
+    bool found=false;
+    for(std::string b : books){
+        if(book.compare(b)==0){
+            found=true;
+            break;
+        }
+    }
+    if(!found)
+        books.push_back(book); //insert book only if not there already
+}
+bool ClientDB::remove_book_from_Inv(std::string book,std::string topic) {
+    std::vector<std::string> books = myInventory.at(topic);
+    for(int i=0;i<books.size();i++){
+        if(book==books.at(i)){
+            books.erase(books.begin()+i); //TODO: hope this works
+            return true;
+        }
+    }
+    return false;
+}
+bool ClientDB::remove_book_from_wishList(std::string book,std::string topic) {;
+    for(int i=0;i<wishList.size();i++){
+        if(book==wishList.at(i)){
+            wishList.erase(wishList.begin()+i); //TODO: hope this works
+            return true;
+        }
+    }
+    return false;
 }
 
 const Protocol &ClientDB::getProtocol() const {
@@ -84,6 +116,29 @@ int ClientDB::getRecIdAndInc() {
     receiptNumCounter ++;
     return receiptNumCounter - 1;
 }
+
+
+bool ClientDB::inv_contains_book(std::string book, std::string topic) const { //returns true if client has book in Inv
+    std::vector<std::string> books = myInventory.at(topic);
+    for(std::string b: books)
+        if(book==b){
+            return true;
+        }
+    return false;
+}
+
+bool ClientDB::wishList_contains(std::string book) {
+    for(std::string b: wishList){
+        if(b==book)
+            return true;
+    }
+    return false;
+}
+
+ std::vector<std::string> &ClientDB::getWishList()  {
+    return wishList;
+}
+
 
 
 
