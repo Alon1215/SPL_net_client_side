@@ -15,7 +15,7 @@ enum string_code{
     LOGIN, JOIN, EXIT, ADD_BOOK, BORROW, RETURN, GENRE, LOGOUT //for keyboard
 
 };
-Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler(handler) {
+Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler(handler),wish_lock(),inv_lock(),borrow_lock() {
 
 }
 
