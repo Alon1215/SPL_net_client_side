@@ -28,7 +28,7 @@ private:
 
 public:
     bool remove_book_from_Inv(std::string book, std::string topic);
-    const std::unordered_map<int, std::vector<std::string>> &getReceiptMap() const;
+     std::unordered_map<int, std::vector<std::string>> &getReceiptMap() ;
 
     void setIsActive(bool isActive);
 

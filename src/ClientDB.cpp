@@ -49,7 +49,7 @@
 
     }
 
-const std::unordered_map<int, std::vector<std::string>> &ClientDB::getReceiptMap() const {
+ std::unordered_map<int, std::vector<std::string>> &ClientDB::getReceiptMap()  {
     return receiptMap;
 }
 

@@ -15,6 +15,11 @@ class Protocol {
 private:
     ClientDB& myDB;
     ConnectionHandler& handler;
+
+    std::mutex wish_lock;
+    std::mutex inv_lock;
+    std::mutex borrow_lock;
+
     int getOpcode(std::string st);
 
 
@@ -25,7 +30,6 @@ public:
     static std::vector<std::string> input_to_vector(const std::string& str, char delimiter);
     static std::vector<std::string> input_to_vector(const std::string& str);
     void send(std::string topic,std::string body);
-
 
 };
 
