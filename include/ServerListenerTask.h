@@ -13,11 +13,12 @@
 class ServerListenerTask {
 private:
     ConnectionHandler& handler;
-    Protocol* protocol; //TODO: impelmet protocol
+    Protocol& protocol; //TODO: impelmet protocol
     ClientDB& db;
     std::string name;
 public:
-    ServerListenerTask(ConnectionHandler &handler, std::string name,ClientDB& db);
+    ServerListenerTask(ConnectionHandler &handler, std::string name,ClientDB& db,Protocol &protocol);
+
     ServerListenerTask(const ServerListenerTask& other);
     std:: vector <std::string> split(std::string st, std::string delimiter);
     void operator()();

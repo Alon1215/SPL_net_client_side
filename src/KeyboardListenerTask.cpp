@@ -3,10 +3,9 @@
 //
 
 #include "../include/KeyboardListenerTask.h"
-KeyboardListenerTask::KeyboardListenerTask(ConnectionHandler handler, std::string name, ClientDB &db) (ConnectionHandler *handler, std::string name, ClientDB &db): handler(&handler), name(name), db(db) {}
+KeyboardListenerTask::KeyboardListenerTask(ConnectionHandler &handler, std::string name, ClientDB &db,Protocol &protocol) : handler(handler), name(name), db(db),protocol(protocol){}
 
 void KeyboardListenerTask::operator()() {
-    Protocol &aProtocol = db.getProtocol();
     bool shouldTerminate = db.getIsShouldTerminate1();
 
     //aProtocol.send("CONNECT", "version:1.2\n\n^@"); //TODO: check if ^@ or \0
@@ -16,7 +15,7 @@ void KeyboardListenerTask::operator()() {
         if (!db.getIsActive()){printf("ERROR: not logged in yet!\n"); }//TODO: should be in STOMP format?
 
         else{
-            aProtocol.process_keyboard(input_string);
+            protocol.process_keyboard(input_string);
         }
 
 //

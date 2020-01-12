@@ -264,7 +264,7 @@ void Protocol::process_keyboard(std::string &msg) {
     /////////////
 
     std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
-    if (vector_for_input.size() != 0 ){printf("ERROR: invalid input\n");} //test purpose only
+    if (vector_for_input.empty() ){printf("ERROR: invalid input\n");} //test purpose only
     else{
         int actionName = getOpcode(vector_for_input.at(0)); //checks first word in input
         switch(actionName) {

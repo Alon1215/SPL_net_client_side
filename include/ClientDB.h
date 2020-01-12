@@ -22,7 +22,6 @@ private:
     std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd = vector of books
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
     std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (first cell = type of msg (disconnect,subscribe,...) second= topic (if needed)
-    Protocol protocol;
     bool isShouldTerminate;
     std::string myName;
     int receiptNumCounter; //this wil be a unique number of each receipt
@@ -56,10 +55,10 @@ public:
 
     void setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap);
     void add_book_to_Inv(std::string book,std::string topic);
-    bool inv_contains_book(std::string book, std::string topic)
-    const
+    bool inv_contains_book(std::string book, std::string topic);
 
-    std::vector<std::string> &getWishList() ;
+    std::vector<std::string> &getWishList();
+
     void setIsShouldTerminate(bool isShouldTerminate);
     bool remove_book_from_wishList(std::string book, std::string topic);
 
@@ -75,10 +74,10 @@ public:
 
     std::unordered_map<std::string, int> getMyTopics();
 
-    Protocol getProtocol();
 
 
     bool wishList_contains(const std::string &book);
+
 };
 
 

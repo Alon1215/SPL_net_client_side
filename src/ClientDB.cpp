@@ -103,7 +103,7 @@ bool ClientDB::getIsShouldTerminate1() const {
 
 
 
-ClientDB::ClientDB(): isShouldTerminate(false), myName(), isActive(false), myInventory(), borrowedMap(), receiptMap(), protocol(),receiptNumCounter(0), subscriptionId(0) {
+ClientDB::ClientDB(): isShouldTerminate(false), myName(), isActive(false), myInventory(), borrowedMap(), receiptMap(),receiptNumCounter(0), subscriptionId(0) {
     //TODO: REMEMBER TO update due to more fields added
     //TODO: check if DB holds an instance of protocol
 }
@@ -121,7 +121,7 @@ int ClientDB::getRecIdAndInc() {
 }
 
 
-bool ClientDB::inv_contains_book(std::string book, std::string topic) const { //returns true if client has book in Inv
+bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //returns true if client has book in Inv
     std::vector<std::string> books = myInventory.at(topic);
     for(std::string b: books)
         if(book==b){
@@ -129,6 +129,7 @@ bool ClientDB::inv_contains_book(std::string book, std::string topic) const { //
         }
     return false;
 }
+
 
 bool ClientDB::wishList_contains(const std::string& book) {
     for(std::string b: wishList){
@@ -138,16 +139,13 @@ bool ClientDB::wishList_contains(const std::string& book) {
     return false;
 }
 
- std::vector<std::string> &ClientDB::getWishList()  {
-    return wishList;
-}
-
-Protocol ClientDB::getProtocol() {
-    return protocol;
-}
 
 std::unordered_map<std::string, int > ClientDB::getMyTopics()  {
     return myTopics;
+}
+
+std::vector<std::string> &ClientDB::getWishList() {
+    return wishList;
 }
 
 

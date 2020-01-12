@@ -12,17 +12,18 @@
 
 class KeyboardListenerTask {
 private:
-    ConnectionHandler* handler;
+    ConnectionHandler& handler;
     ClientDB& db;
     std::string name;
     bool shouldTerminate;
+    Protocol &protocol;
 
 public:
-    KeyboardListenerTask(ConnectionHandler *handler, std::string name, ClientDB& db);
+    KeyboardListenerTask(ConnectionHandler &handler, std::string name, ClientDB& db,Protocol &protocol);
     KeyboardListenerTask(const KeyboardListenerTask& other);
     std:: vector <std::string> split(std::string st, std::string delimiter);
     void operator()();
-    virtual ~KeyboardListenerTask()();
+    virtual ~KeyboardListenerTask();
     KeyboardListenerTask& operator=(const KeyboardListenerTask& other);
 
 
