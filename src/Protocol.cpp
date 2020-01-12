@@ -271,11 +271,18 @@ void Protocol::process_keyboard(std::string &msg) {
                 subID = myDB.getSubIdAndInc();body = "destination:" + topic + "\nid:";
                 body += subID + "\nreceipt:" + receiptId;
 
-                send("SUBSCRIBE","destination:" + topic + "\nid:" + subID + "\nreceipt:" + receiptId );
+                send("SUBSCRIBE","destination:" + topic + "\nid:" + subID + "\nreceipt:" + receiptId ); //TODO: fix problem
+                std::vector<std::string> tmpVector;
+                tmpVector.push_back("SUBSCRIBE");
+                tmpVector.push_back(topic);
+                myDB.getReceiptMap().insert(std::pair<receiptId,tmpVector);
+
+                //TODO: not finished!
 
 
                 break;
             case EXIT:
+
 
                 break;
             case ADD_BOOK:
