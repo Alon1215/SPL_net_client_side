@@ -49,7 +49,7 @@
 
     }
 
- std::unordered_map<int, std::vector<std::string>> &ClientDB::getReceiptMap()  {
+ std::unordered_map<int, std::vector<std::string>> ClientDB::getReceiptMap()  {
     return receiptMap;
 }
 
@@ -137,8 +137,12 @@ bool ClientDB::wishList_contains(std::string book) {
     return wishList;
 }
 
-const Protocol &ClientDB::getProtocol() const {
+Protocol ClientDB::getProtocol() {
     return protocol;
+}
+
+std::unordered_map<std::string, int > ClientDB::getMyTopics()  {
+    return myTopics;
 }
 
 

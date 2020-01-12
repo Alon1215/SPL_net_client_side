@@ -253,6 +253,8 @@ void Protocol::process_keyboard(std::string &msg) {
     int receiptId ;
     int subID ;
     std::string body;
+    std::vector<std::string> tmpVector;
+
     /////////////
 
     std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
@@ -268,24 +270,32 @@ void Protocol::process_keyboard(std::string &msg) {
             case JOIN:
                 topic = vector_for_input.at(1);
                 receiptId = myDB.getRecIdAndInc();
-                subID = myDB.getSubIdAndInc();body = "destination:" + topic + "\nid:";
-                body += subID + "\nreceipt:" + receiptId;
+                subID = myDB.getSubIdAndInc();
 
-                send("SUBSCRIBE","destination:" + topic + "\nid:" + subID + "\nreceipt:" + receiptId ); //TODO: fix problem
-                std::vector<std::string> tmpVector;
+                send("SUBSCRIBE","destination:" + topic + "\nid:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId) );
                 tmpVector.push_back("SUBSCRIBE");
-                tmpVector.push_back(topic);
-                myDB.getReceiptMap().insert(std::pair<receiptId,tmpVector);
+                tmpVector.push_back(vector_for_input.at(1));
+                myDB.getReceiptMap().insert(std::make_pair<int, std::vector<std::string>(receiptId,tmpVector)); //TODO: fix problem
+                myDB.getMyTopics().insert(topic, subID);
 
-                //TODO: not finished!
+                //TODO: not finished! notice
 
 
                 break;
             case EXIT:
-
+                subID = myDB.getMyTopics().at(vector_for_input.at(1));
+                receiptId = myDB.getRecIdAndInc();
+                send("UNSUBSCRIBE","id:"+topic + "\nreceipt:" + std::to_string(subID));
+                //TODO: ALON is the order of id and receipt important?
+                tmpVector.push_back("UNSUBSCRIBE");
+                tmpVector.push_back(vector_for_input.at(1));
+                myDB.getReceiptMap().insert(std::make_pair<int, std::vector<std::string>(receiptId,tmpVector)); //TODO: fix problem
+                if (myDB.getMyTopics().erase()) {}
 
                 break;
             case ADD_BOOK:
+                topic = vector_for_input.at(1);
+
 
                 break;
             case BORROW:

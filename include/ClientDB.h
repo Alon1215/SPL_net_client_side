@@ -15,6 +15,8 @@
 class ClientDB {
 
 private:
+
+    std::unordered_map<std::string, int> myTopics; // key = topic name , val = sub id
     bool isActive;
     std::vector<std::string> wishList;
     std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd =
@@ -28,7 +30,7 @@ private:
 
 public:
     bool remove_book_from_Inv(std::string book, std::string topic);
-    std::unordered_map<int, std::vector<std::string>> &getReceiptMap();
+    std::unordered_map<int, std::vector<std::string>> getReceiptMap();
 
     void setIsActive(bool isActive);
 
@@ -57,7 +59,6 @@ public:
     bool inv_contains_book(std::string book, std::string topic)
     const
 
-    Protocol &getProtocol() const;
 
     bool wishList_contains(std::string book);
     std::vector<std::string> &getWishList() ;
@@ -74,7 +75,9 @@ public:
 
     ClientDB();
 
+    std::unordered_map<std::string, int> getMyTopics();
 
+    Protocol getProtocol();
 };
 
 
