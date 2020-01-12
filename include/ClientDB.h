@@ -17,7 +17,7 @@ class ClientDB {
 private:
     bool isActive;
     std::vector<std::string> wishList;
-    std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd =
+    std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd = vector of books
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
     std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (first cell = type of msg (disconnect,subscribe,...) second= topic (if needed)
     Protocol protocol;
