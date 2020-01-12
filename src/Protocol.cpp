@@ -297,7 +297,6 @@ void Protocol::process_keyboard(std::string &msg) {
                 tmpVector.push_back(vector_for_input.at(1));
                 myDB.getReceiptMap().insert(std::make_pair<int, std::vector<std::string>(receiptId,tmpVector)); //TODO: fix problem
                 if (myDB.getMyTopics().erase()) {}
-
                 break;
             case ADD_BOOK:
                 vector_for_input.at(2) = unify_book_name(vector_for_input); //get unified by - book name
@@ -323,7 +322,6 @@ void Protocol::process_keyboard(std::string &msg) {
                 myDB.getReceiptMap().insert(std::make_pair(receiptId,receipt_vec));
                 send_stomp_frame((std::string &) "DISCONNECT","receipt:" + std::to_string(receiptId) + "\n\n");
                 break;
-
             default: //TODO: should choose what to do in case invalid msg header recieved
                 break;
         }
@@ -339,8 +337,7 @@ std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
     for(int i =3; i<vec.size();i++){
         output = output +"-"+vec.at(i);
     }
-    r
-    eturn output;
+    return output;
 }
 
 std::string Protocol::fix_body(std::string &body) {

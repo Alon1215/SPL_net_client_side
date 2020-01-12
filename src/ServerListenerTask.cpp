@@ -15,9 +15,6 @@ void ServerListenerTask::operator()() {
             db.setIsActive(false);
             break;
         }
-
-
-
     }
 }
 

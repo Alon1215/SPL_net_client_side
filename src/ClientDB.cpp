@@ -55,6 +55,10 @@
 
 void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
     std::vector<std::string> books = myInventory.at(topic);
+
+    if(myInventory.count(topic)==0) {
+        myInventory.insert(std::make_pair(topic,std::vector<std::string>()));
+    }
     bool found=false;
     for(std::string b : books){
         if(book.compare(b)==0){
@@ -125,7 +129,7 @@ bool ClientDB::inv_contains_book(std::string book, std::string topic) const { //
     return false;
 }
 
-bool ClientDB::wishList_contains(std::string book) {
+bool ClientDB::wishList_contains(const std::string& book) {
     for(std::string b: wishList){
         if(b==book)
             return true;
