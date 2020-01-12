@@ -61,7 +61,10 @@ int main () {
             KeyboardListenerTask keyBoardListenerTask(&connectionHandler, myName, clientDb);
             std::thread th1(std::ref(serverListenerTask)); //TODO: Check if ok
 
-            aProtocol.send("CONNECT", "version:1.2"); //TODO: check if ^@ or \0
+            aProtocol.send("CONNECT", "accept-version:1.2 \n"
+                                      "host:stomp.cs.bgu.ac.il \n"
+                                      "login:"+myName+"\n "
+                                                      "password:" + password); //TODO: check if ^@ or \0
             std::thread th2(std::ref(keyBoardListenerTask)); //TODO: Check if ok
 
             //now client is up and running. waits until logged out:

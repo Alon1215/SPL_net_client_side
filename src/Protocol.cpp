@@ -256,6 +256,8 @@ void Protocol::process_keyboard(std::string &msg) {
     int receiptId ;
     int subID ;
     std::string body;
+    std::vector<std::string> tmpVector;
+
     std::string loaner_name;
     std::vector<std::string> receipt_vec;
     std::string send_string;
@@ -264,7 +266,6 @@ void Protocol::process_keyboard(std::string &msg) {
     std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
     if (vector_for_input.size() != 0 ){printf("ERROR: invalid input\n");} //test purpose only
     else{
-        std::vector<std::string> tmpVector;
         int actionName = getOpcode(vector_for_input.at(0)); //checks first word in input
         switch(actionName) {
             case LOGIN:
@@ -275,22 +276,27 @@ void Protocol::process_keyboard(std::string &msg) {
             case JOIN:
                 topic = vector_for_input.at(1);
                 receiptId = myDB.getRecIdAndInc();
-                subID = myDB.getSubIdAndInc();body = "destination:" + topic + "\nid:";
-                body += subID + "\nreceipt:" + receiptId;
+                subID = myDB.getSubIdAndInc();
 
-                send("SUBSCRIBE","destination:" + topic + "\nid:" + subID + "\nreceipt:" + receiptId ); //TODO: fix problem
-
+                send("SUBSCRIBE","destination:" + topic + "\nid:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId) );
                 tmpVector.push_back("SUBSCRIBE");
-                tmpVector.push_back(topic);
-                myDB.getReceiptMap().insert(receiptId,tmpVector);
+                tmpVector.push_back(vector_for_input.at(1));
+                myDB.getReceiptMap().insert(std::make_pair<int, std::vector<std::string>(receiptId,tmpVector)); //TODO: fix problem
+                myDB.getMyTopics().insert(topic, subID);
 
-
-                //TODO: not finished!
+                //TODO: not finished! notice
 
 
                 break;
             case EXIT:
-
+                subID = myDB.getMyTopics().at(vector_for_input.at(1));
+                receiptId = myDB.getRecIdAndInc();
+                send("UNSUBSCRIBE","id:"+topic + "\nreceipt:" + std::to_string(subID));
+                //TODO: ALON is the order of id and receipt important?
+                tmpVector.push_back("UNSUBSCRIBE");
+                tmpVector.push_back(vector_for_input.at(1));
+                myDB.getReceiptMap().insert(std::make_pair<int, std::vector<std::string>(receiptId,tmpVector)); //TODO: fix problem
+                if (myDB.getMyTopics().erase()) {}
 
                 break;
             case ADD_BOOK:
