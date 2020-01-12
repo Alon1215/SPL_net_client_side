@@ -21,10 +21,6 @@ Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler
 
 
 
-//void Protocol::process_keyboard(std::string  &msg) {
-
-//}
-
 void Protocol::process_server(std::string &msg) {
     std::vector<std::string> result; //vector of all lines in input msg
     std::vector<std::string> parse_vec;
@@ -54,7 +50,7 @@ void Protocol::process_server(std::string &msg) {
                         boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                         topic = parse_vec.at(1);
                         if(myDB.remove_book_from_Inv(book,topic)){
-                            std::cout << "Borrowed " <<book <<  std::endl;
+                            std::cout << "Borrowed " <<fix_body(book) <<  std::endl;
                         }
                     }
 
@@ -98,13 +94,13 @@ void Protocol::process_server(std::string &msg) {
                                     myDB.remove_book_from_wishList(book,topic);
                                     myDB.add_book_to_Inv(book,topic); //add the loaned book
                                     myDB.getBorrowedMap().insert(book,other_name); //add borrower to borrow map
-                                    send(topic,"Taking "+book+" from "+ other_name);
+                                    send(topic,"Taking "+fix_body(book)+" from "+ other_name);
                                 }
                             }
                             break;
                         default: // someone sent me a book status, i shall print it!
                             body = result.at(5);
-                            std::cout << body << std::endl; //print status
+                            std::cout << fix_body(body) << std::endl; //print status
                             break;
 
                     }
@@ -243,6 +239,13 @@ void Protocol::send(std::string topic, std::string body) {
     toSend="SEND\n destination:" + topic + "\n\n" + body + "\n\0";
     handler.sendLine(toSend);
 }
+void Protocol::send_stomp_frame(std::string header, std::string body) {
+    std::string toSend;
+    toSend = header+"\n"+body+ "\n\0";
+    handler.sendLine(toSend);
+}
+
+
 
 
 
@@ -255,6 +258,9 @@ void Protocol::process_keyboard(std::string &msg) {
     std::string body;
     std::vector<std::string> tmpVector;
 
+    std::string loaner_name;
+    std::vector<std::string> receipt_vec;
+    std::string send_string;
     /////////////
 
     std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
@@ -294,21 +300,28 @@ void Protocol::process_keyboard(std::string &msg) {
 
                 break;
             case ADD_BOOK:
-                topic = vector_for_input.at(1);
-
-
+                vector_for_input.at(2) = unify_book_name(vector_for_input); //get unified by - book name
+                myDB.add_book_to_Inv(vector_for_input.at(2),vector_for_input.at(1));
+                send(vector_for_input.at(1),myDB.getMyName() +" has added the book " + vector_for_input.at(2));
                 break;
             case BORROW:
-
+                myDB.getWishList().push_back(vector_for_input.at(2)); //add to my wish-list
+                send(vector_for_input.at(1),myDB.getMyName()+" wish to borrow "+vector_for_input.at(2));
                 break;
             case RETURN:
-
+                myDB.remove_book_from_Inv(vector_for_input.at(2),vector_for_input.at(1)); //remove from my inv
+                loaner_name = myDB.getBorrowedMap().at(vector_for_input.at(2));
+                myDB.getBorrowedMap().erase(vector_for_input.at(2)); //remove borrower from borrow map
+                send(vector_for_input.at(1),"Returning "+vector_for_input.at(2)+" to " + loaner_name);
                 break;
             case GENRE:
 
                 break;
             case LOGOUT:
-
+                receipt_vec.push_back("DISCONNECT");
+                receiptId = myDB.getRecIdAndInc(),
+                myDB.getReceiptMap().insert(std::make_pair(receiptId,receipt_vec));
+                send_stomp_frame((std::string &) "DISCONNECT","receipt:" + std::to_string(receiptId) + "\n\n");
                 break;
 
             default: //TODO: should choose what to do in case invalid msg header recieved
@@ -320,6 +333,35 @@ void Protocol::process_keyboard(std::string &msg) {
 
 
 }
+
+std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
+    std::string output=vec.at(2);
+    for(int i =3; i<vec.size();i++){
+        output = output +"-"+vec.at(i);
+    }
+    return output;
+}
+
+std::string Protocol::fix_body(std::string &body) {
+    std::string toPrint;
+    for(char c: body){
+        if(c=='-')
+            toPrint+=' ';
+        else
+            toPrint+=c;
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
 
 
 
