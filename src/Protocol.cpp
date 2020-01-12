@@ -278,11 +278,12 @@ void Protocol::process_keyboard(std::string &msg) {
                 receiptId = myDB.getRecIdAndInc();
                 subID = myDB.getSubIdAndInc();
 
-                send("SUBSCRIBE","destination:" + topic + "\nid:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId) );
+                send_stomp_frame("SUBSCRIBE","destination:" + topic + "\nid:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId) );
                 tmpVector.push_back("SUBSCRIBE");
                 tmpVector.push_back(vector_for_input.at(1));
-                myDB.getReceiptMap().insert(std::make_pair<int, std::vector<std::string>(receiptId,tmpVector)); //TODO: fix problem
-                myDB.getMyTopics().insert(topic, subID);
+                //insert to maps:
+                myDB.getReceiptMap().insert(std::make_pair(receiptId, tmpVector)); //TODO: fix problem
+                myDB.getMyTopics().insert(std::make_pair(topic, subID));
 
                 //TODO: not finished! notice
 
@@ -291,12 +292,15 @@ void Protocol::process_keyboard(std::string &msg) {
             case EXIT:
                 subID = myDB.getMyTopics().at(vector_for_input.at(1));
                 receiptId = myDB.getRecIdAndInc();
-                send("UNSUBSCRIBE","id:"+topic + "\nreceipt:" + std::to_string(subID));
+                send_stomp_frame("UNSUBSCRIBE","id:"+ std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId));
                 //TODO: ALON is the order of id and receipt important?
+
                 tmpVector.push_back("UNSUBSCRIBE");
                 tmpVector.push_back(vector_for_input.at(1));
-                myDB.getReceiptMap().insert(std::make_pair<int, std::vector<std::string>(receiptId,tmpVector)); //TODO: fix problem
-                if (myDB.getMyTopics().erase()) {}
+                myDB.getReceiptMap().insert(std::make_pair(receiptId,tmpVector)); //TODO: fix problem
+                if (myDB.getMyTopics().count(vector_for_input.at(1)) == 1) { //TODO ALON: CHECK!
+                    myDB.getMyTopics().erase(vector_for_input.at(1));
+                }
 
                 break;
             case ADD_BOOK:
@@ -315,6 +319,8 @@ void Protocol::process_keyboard(std::string &msg) {
                 send(vector_for_input.at(1),"Returning "+vector_for_input.at(2)+" to " + loaner_name);
                 break;
             case GENRE:
+                send(vector_for_input.at(1), "book status");
+                //TODO: ALON is there suppose to be anything else?
 
                 break;
             case LOGOUT:

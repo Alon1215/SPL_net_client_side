@@ -54,6 +54,7 @@
 }
 
 void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
+    //TODO ALON: check if cause errors
     std::vector<std::string> books = myInventory.at(topic);
     bool found=false;
     for(std::string b : books){
