@@ -59,8 +59,6 @@ public:
     bool inv_contains_book(std::string book, std::string topic)
     const
 
-
-    bool wishList_contains(std::string book);
     std::vector<std::string> &getWishList() ;
     void setIsShouldTerminate(bool isShouldTerminate);
     bool remove_book_from_wishList(std::string book, std::string topic);
@@ -78,6 +76,9 @@ public:
     std::unordered_map<std::string, int> getMyTopics();
 
     Protocol getProtocol();
+
+
+    bool wishList_contains(const std::string &book);
 };
 
 

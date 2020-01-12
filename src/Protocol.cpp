@@ -329,7 +329,6 @@ void Protocol::process_keyboard(std::string &msg) {
                 myDB.getReceiptMap().insert(std::make_pair(receiptId,receipt_vec));
                 send_stomp_frame((std::string &) "DISCONNECT","receipt:" + std::to_string(receiptId) + "\n\n");
                 break;
-
             default: //TODO: should choose what to do in case invalid msg header recieved
                 break;
         }
@@ -345,8 +344,7 @@ std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
     for(int i =3; i<vec.size();i++){
         output = output +"-"+vec.at(i);
     }
-    r
-    eturn output;
+    return output;
 }
 
 std::string Protocol::fix_body(std::string &body) {
