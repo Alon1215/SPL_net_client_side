@@ -9,8 +9,6 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include "Protocol.h"
-
 
 class ClientDB {
 
@@ -29,6 +27,7 @@ private:
 
 public:
     bool remove_book_from_Inv(std::string book, std::string topic);
+
     std::unordered_map<int, std::vector<std::string>> getReceiptMap();
 
     void setIsActive(bool isActive);
@@ -54,12 +53,13 @@ public:
      std::unordered_map<std::string, std::string> &getBorrowedMap() ;
 
     void setBorrowedMap(const std::unordered_map<std::string, std::string> &borrowedMap);
+
     void add_book_to_Inv(std::string book,std::string topic);
+
     bool inv_contains_book(std::string book, std::string topic);
 
     std::vector<std::string> &getWishList();
 
-    void setIsShouldTerminate(bool isShouldTerminate);
     bool remove_book_from_wishList(std::string book, std::string topic);
 
     void setIsShouldTerminate(bool isShouldTerminate);
@@ -70,13 +70,12 @@ public:
 
     int getRecIdAndInc();
 
-    ClientDB();
-
     std::unordered_map<std::string, int> getMyTopics();
 
-
-
     bool wishList_contains(const std::string &book);
+
+    //constructor:
+    ClientDB();
 
 };
 

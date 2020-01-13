@@ -18,12 +18,7 @@ private:
     std::string name;
 public:
     ServerListenerTask(ConnectionHandler &handler, std::string name,ClientDB& db,Protocol &protocol);
-
-    ServerListenerTask(const ServerListenerTask& other);
-    std:: vector <std::string> split(std::string st, std::string delimiter);
     void operator()();
-    virtual ~ServerListenerTask();
-    ServerListenerTask& operator=(const ServerListenerTask& other);
 
 
 };

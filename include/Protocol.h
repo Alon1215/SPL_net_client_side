@@ -13,8 +13,8 @@
 
 class Protocol {
 private:
-    ClientDB& myDB;
     ConnectionHandler& handler;
+    ClientDB& myDB;
     std::mutex wish_lock;
     std::mutex inv_lock;
     std::mutex borrow_lock;

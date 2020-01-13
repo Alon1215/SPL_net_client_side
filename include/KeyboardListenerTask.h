@@ -20,11 +20,8 @@ private:
 
 public:
     KeyboardListenerTask(ConnectionHandler &handler, std::string name, ClientDB& db,Protocol &protocol);
-    KeyboardListenerTask(const KeyboardListenerTask& other);
-    std:: vector <std::string> split(std::string st, std::string delimiter);
+//    std:: vector <std::string> split(std::string st, std::string delimiter); //TODO: ALON 13.1 why?
     void operator()();
-    virtual ~KeyboardListenerTask();
-    KeyboardListenerTask& operator=(const KeyboardListenerTask& other);
 
 
 };

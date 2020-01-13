@@ -15,7 +15,7 @@ enum string_code{
     LOGIN, JOIN, EXIT, ADD_BOOK, BORROW, RETURN, GENRE, LOGOUT //for keyboard
 
 };
-Protocol::Protocol(ClientDB &db, ConnectionHandler &handler): myDB(db) , handler(handler),wish_lock(),inv_lock(),borrow_lock() {
+Protocol::Protocol(ClientDB& db, ConnectionHandler& handler): myDB(db) , handler(handler),wish_lock(),inv_lock(),borrow_lock() {
 
 }
 
@@ -93,7 +93,7 @@ void Protocol::process_server(std::string &msg) {
                                 if(myDB.wishList_contains(book)){
                                     myDB.remove_book_from_wishList(book,topic);
                                     myDB.add_book_to_Inv(book,topic); //add the loaned book
-                                    myDB.getBorrowedMap().insert(book,other_name); //add borrower to borrow map
+                                    myDB.getBorrowedMap().insert(std::make_pair(book,other_name)); //add borrower to borrow map
                                     send(topic,"Taking "+fix_body(book)+" from "+ other_name);
                                 }
                             }

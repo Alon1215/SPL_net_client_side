@@ -1,6 +1,20 @@
 cmake_minimum_required(VERSION 3.15)
 project(spl_net_Client)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 set(CMAKE_CXX_STANDARD 11)
+link_libraries("-lboost_system")
 
-add_executable(spl_net_Client main.cpp src/echoClient.cpp src/StompBookClubClient.cpp src/connectionHandler.cpp src/ClientDB.cpp include/ClientDB.h src/ServerListenerTask.cpp include/ServerListenerTask.h src/Protocol.cpp include/Protocol.h src/KeyboardListenerTask.cpp include/KeyboardListenerTask.h)
+add_executable(spl_net_Client
+        include/connectionHandler.h
+        include/ClientDB.h
+        include/KeyboardListenerTask.h
+        include/Protocol.h
+        include/ServerListenerTask.h
+        src/connectionHandler.cpp
+        src/ClientDB.cpp
+        src/KeyboardListenerTask.cpp
+        src/Protocol.cpp
+        src/ServerListenerTask.cpp
+        src/StompBookClubClient.cpp
+        CMakeLists.txt
+        )
