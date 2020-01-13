@@ -15,6 +15,7 @@ void ServerListenerTask::operator()() {
             db.setIsActive(false);
             break;
         }
+        protocol.process_server(inMsg);
     }
 }
 

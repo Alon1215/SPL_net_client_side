@@ -15,9 +15,6 @@ class Protocol {
 private:
     ConnectionHandler& handler;
     ClientDB& myDB;
-    std::mutex wish_lock;
-    std::mutex inv_lock;
-    std::mutex borrow_lock;
     int getOpcode(std::string st);
     std::string unify_book_name(std::vector<std::string> &vec);
     std::string fix_body(std::string &body);

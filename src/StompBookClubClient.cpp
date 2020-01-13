@@ -13,9 +13,6 @@ int main () {
     printf("Welcome to the wap, start by log in:\n");
     while (1) {
 
-//        ClientDB clientDb;
-//        Protocol aProtocol; //TODO: ALON 11.12 1610 is right syntax?
-
         //handle the login (first command):
         std::string input_string;
         getline(std::cin, input_string);
@@ -48,7 +45,6 @@ int main () {
         port = (short) std::stoi(tmpPort); //converting the string to int, and casted to short (assump: valid input)
         std::string myName = vector_for_input.at(2);
         std::string password = vector_for_input.at(3);
-//        clientDb.setMyName(myName); //TODO: ALON DELETE
 
 
         //creating connection with server:
