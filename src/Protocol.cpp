@@ -195,17 +195,14 @@ void Protocol::process_keyboard(std::string &msg) {
                 topic = vector_for_input.at(1);
                 receiptId = myDB.getRecIdAndInc();
                 subID = myDB.getSubIdAndInc();
-
-                send_stomp_frame("SUBSCRIBE", "destination:" + topic + "\nid:" + std::to_string(subID) + "\nreceipt:" +
-                                              std::to_string(receiptId));
                 tmpVector.push_back("SUBSCRIBE");
                 tmpVector.push_back(vector_for_input.at(1));
                 tmpVector.push_back(std::to_string(subID));
                 //insert to maps:
                 myDB.add_receipt(receiptId, tmpVector);
-                //myDB.getMyTopics().insert(std::make_pair(topic, subID));
 
-                //TODO: not finished! notice
+                send_stomp_frame("SUBSCRIBE", "destination:" + topic + "\nid:" + std::to_string(subID) + "\nreceipt:" +
+                                              std::to_string(receiptId));
 
                 break;
             }
@@ -213,17 +210,15 @@ void Protocol::process_keyboard(std::string &msg) {
                 subID = myDB.get_subscription_id(vector_for_input.at(1));
                 //subID = myDB.getMyTopics().at(vector_for_input.at(1));
                 receiptId = myDB.getRecIdAndInc();
-                send_stomp_frame("UNSUBSCRIBE",
-                                 "id:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId));
 
                 tmpVector.push_back("UNSUBSCRIBE");
                 tmpVector.push_back(vector_for_input.at(1));
                 tmpVector.push_back(std::to_string(subID));
                 myDB.add_receipt(receiptId,tmpVector);
-                //myDB.getReceiptMap().insert(std::make_pair(receiptId, tmpVector));
-//                if (myDB.getMyTopics().count(vector_for_input.at(1)) == 1) { //TODO ALON: CHECK!
-//                    myDB.getMyTopics().erase(vector_for_input.at(1));
-//                }
+
+                send_stomp_frame("UNSUBSCRIBE",
+                                 "id:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId));
+
                 break;
             }
             case ADD_BOOK: {
@@ -362,12 +357,12 @@ int Protocol::getOpcode(std::string st) {
 
 void Protocol::send(std::string topic, std::string body) {
     std::string toSend;
-    toSend="SEND\n destination:" + topic + "\n\n" + body + "\n\0";
+    toSend="SEND\n destination:" + topic + "\n\n" + body + "\n"+'\0';
     handler.sendLine(toSend);
 }
 void Protocol::send_stomp_frame(std::string header, std::string body) {
     std::string toSend;
-    toSend = header+"\n"+body+ "\n\n\0";
+    toSend = header+"\n"+body+ "\n\n"+'\0';
     handler.sendLine(toSend);
 }
 
