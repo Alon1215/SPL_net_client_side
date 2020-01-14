@@ -15,11 +15,7 @@ enum string_code{
     LOGIN, JOIN, EXIT, ADD_BOOK, BORROW, RETURN, GENRE, LOGOUT //for keyboard
 
 };
-Protocol::Protocol(ClientDB& db, ConnectionHandler& handler): myDB(db) , handler(handler),wish_lock(),inv_lock(),borrow_lock() {
-
-}
-
-
+Protocol::Protocol(ClientDB& db, ConnectionHandler& handler): myDB(db) , handler(handler) {}
 
 void Protocol::process_server(std::string &msg) {
     std::vector<std::string> result; //vector of all lines in input msg
@@ -36,109 +32,233 @@ void Protocol::process_server(std::string &msg) {
     int opcode2;
     int opcode3;
     switch(opcode) {
-        case connected:
+        case connected: {
             myDB.setIsActive(true);
             std::cout << "Successfully connected to Server!..\n" << std::endl;
             break;
-        case message:
+        }
+        case message: {
             boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
-            opcode2=getOpcode(parse_vec.at(0)); //get first word code
-            switch(opcode2) {
-                case taking:
+            opcode2 = getOpcode(parse_vec.at(0)); //get first word code
+            switch (opcode2) {
+                case taking: {
                     if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
                         book = parse_vec.at(1);
                         boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                         topic = parse_vec.at(1);
-                        if(myDB.remove_book_from_Inv(book,topic)){
-                            std::cout << "Borrowed " <<fix_body(book) <<  std::endl;
+                        if (myDB.remove_book_from_Inv(book, topic)) {
+                            std::cout << "Borrowed " << fix_body(book) << std::endl;
                         }
                     }
 
                     break;
-
-                case bookstatus:
+                }
+                case bookstatus: {
                     body = myDB.getMyName() + ":";
                     boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                     topic = parse_vec.at(1);
-                    books = myDB.getMyInventory().at(topic);
+                    books = myDB.get_topic_books(topic);
                     for (std::string book: books)
                         body = body + book + ",";
 
                     send(topic, body);//send frame
                     break;
-                case returning:
-                    if(parse_vec.size()>=4 && parse_vec.at(3) ==myDB.getMyName()){ //if book is being returned to me
+                }
+                case returning: {
+                    if (parse_vec.size() >= 4 &&
+                        parse_vec.at(3) == myDB.getMyName()) { //if book is being returned to me
                         book = parse_vec.at(1);
-                        boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic //TODO:check that this wont change book variable value
+                        boost::split(parse_vec, result.at(3), boost::is_any_of(
+                                ":")); //get topic //TODO:check that this wont change book variable value
                         topic = parse_vec.at(1);
-                        myDB.add_book_to_Inv(book,topic); //take book back to inv
+                        myDB.add_book_to_Inv(book, topic); //take book back to inv
                     }
                     break;
-                default:
+                }
+                default: {
                     opcode3 = getOpcode(parse_vec.at(1));
                     book = parse_vec.at(4); //TODO:maybe move back to avoid double code
-                    switch (opcode3){
-                        case wish:
+                    switch (opcode3) {
+                        case wish: {
 
-
-                            if(myDB.inv_contains_book(book,topic)){
-                                send(topic,myDB.getMyName()+" has "+book); //if i have this book send has frame
+                            if (myDB.inv_contains_book(book, topic)) {
+                                send(topic, myDB.getMyName() + " has " + book); //if i have this book send has frame
                             }
                             break;
-                        case has:
+                        }
+                        case has: {
                             other_name = parse_vec.at(0);
-                            if(myDB.getMyName()!=other_name){ //act only if this isn't my message
-                                boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic //TODO:check that this wont change book variable value
+                            if (myDB.getMyName() != other_name) { //act only if this isn't my message
+                                boost::split(parse_vec, result.at(3), boost::is_any_of(
+                                        ":")); //get topic //TODO:check that this wont change book variable value
                                 topic = parse_vec.at(1);
-                                if(myDB.wishList_contains(book)){
-                                    myDB.remove_book_from_wishList(book,topic);
-                                    myDB.add_book_to_Inv(book,topic); //add the loaned book
-                                    myDB.getBorrowedMap().insert(std::make_pair(book,other_name)); //add borrower to borrow map
-                                    send(topic,"Taking "+fix_body(book)+" from "+ other_name);
+                                if (myDB.wishList_contains(book)) {
+                                    myDB.remove_book_from_wishList(book);
+                                    myDB.add_book_to_Inv(book, topic); //add the loaned book
+                                    myDB.add_book_to_borrowdMap(book,other_name);
+                                    //myDB.getBorrowedMap().insert(std::make_pair(book, other_name)); //add borrower to borrow map
+                                    send(topic, "Taking " + fix_body(book) + " from " + other_name);
                                 }
                             }
                             break;
-                        default: // someone sent me a book status, i shall print it!
+                        }
+                        default: { // someone sent me a book status, i shall print it!
                             body = result.at(5);
                             std::cout << fix_body(body) << std::endl; //print status
                             break;
+                        }
 
                     }
+                }
 
             }
 
             break;
-        case receipt:
+        }
+        case receipt: {
             boost::split(parse_vec, result.at(1), boost::is_any_of(":"));
             receipt_num = stoi(parse_vec.at(1)); //get receipt number
-            mission_info = myDB.getReceiptMap().at(receipt_num);
+            myDB.get_receipt_info(receipt_num);
+            //mission_info = myDB.getReceiptMap().at(receipt_num);
             opcode2 = getOpcode(mission_info.at(0)); //get the type of my receipt message
-            switch(opcode2){
-                case disconnect:
+            switch (opcode2) {
+                case disconnect: {
                     myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
                     myDB.setIsShouldTerminate(true);
                     handler.close(); //close the socket
                     std::cout << "Successful logout from Server!..\n" << std::endl;
                     break;
-                case subscribe:
+                }
+                case subscribe: {
+
+                    myDB.add_to_myTopics(mission_info.at(1),stoi(mission_info.at(2)));
                     std::cout << "Joined club "
                               << mission_info.at(1) << std::endl;
                     break;
-                case unsubscribe:
+                }
+                case unsubscribe: {
+                    myDB.remove_from_myTopics(mission_info.at(1));
                     std::cout << "Exited club "
                               << mission_info.at(1) << std::endl;
                     break;
+                }
+                default:{
+                    std::cout << result.at(5) << std::endl; //print what happened, for testing purposes
+                    break;
+                }
             }
-        case error:
-            std::cout << "Error occured \n: "
+            break;
+        }
+        case error: {
+            std::cout << "Error occured:\n"
                       << msg << std::endl;
             myDB.setIsShouldTerminate(true);
             myDB.setIsActive(false);
             handler.close();
-
-        default: //TODO: should choose what to do in case invalid msg header recieved
             break;
+        }
+        default: { //TODO: should choose what to do in case invalid msg header recieved
+            break;
+        }
     }
+
+}
+
+
+void Protocol::process_keyboard(std::string &msg) {
+
+    ////////////////
+    //parameters to prove the method's flow:
+    std::string topic ;
+    int receiptId ;
+    int subID ;
+    std::string body;
+    std::vector<std::string> tmpVector;
+
+    std::string loaner_name;
+    std::vector<std::string> receipt_vec;
+    std::string send_string;
+    /////////////
+
+    std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
+    if (vector_for_input.empty() ){printf("ERROR: invalid input\n");} //test purpose only
+    else{
+        int actionName = getOpcode(vector_for_input.at(0)); //checks first word in input
+        switch(actionName) {
+            case LOGIN: {
+                //assumption: already logged in
+                printf("ERROR: Already logged in!\n");//TODO: should be in STOMP format?
+
+                break;
+            }
+            case JOIN: {
+                topic = vector_for_input.at(1);
+                receiptId = myDB.getRecIdAndInc();
+                subID = myDB.getSubIdAndInc();
+                tmpVector.push_back("SUBSCRIBE");
+                tmpVector.push_back(vector_for_input.at(1));
+                tmpVector.push_back(std::to_string(subID));
+                //insert to maps:
+                myDB.add_receipt(receiptId, tmpVector);
+
+                send_stomp_frame("SUBSCRIBE", "destination:" + topic + "\nid:" + std::to_string(subID) + "\nreceipt:" +
+                                              std::to_string(receiptId));
+
+                break;
+            }
+            case EXIT: {
+                subID = myDB.get_subscription_id(vector_for_input.at(1));
+                //subID = myDB.getMyTopics().at(vector_for_input.at(1));
+                receiptId = myDB.getRecIdAndInc();
+
+                tmpVector.push_back("UNSUBSCRIBE");
+                tmpVector.push_back(vector_for_input.at(1));
+                tmpVector.push_back(std::to_string(subID));
+                myDB.add_receipt(receiptId,tmpVector);
+
+                send_stomp_frame("UNSUBSCRIBE",
+                                 "id:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId));
+
+                break;
+            }
+            case ADD_BOOK: {
+                vector_for_input.at(2) = unify_book_name(vector_for_input); //get unified by - book name
+                myDB.add_book_to_Inv(vector_for_input.at(2), vector_for_input.at(1));
+                send(vector_for_input.at(1), myDB.getMyName() + " has added the book " + vector_for_input.at(2));
+                break;
+            }
+            case BORROW:{
+
+                myDB.add_book_to_wishList(vector_for_input.at(2));
+                send(vector_for_input.at(1),myDB.getMyName()+" wish to borrow "+vector_for_input.at(2));
+                break;
+            }
+            case RETURN: {
+                myDB.remove_book_from_Inv(vector_for_input.at(2), vector_for_input.at(1)); //remove from my inv
+                loaner_name = myDB.get_loaner_name(vector_for_input.at(2));
+                //loaner_name = myDB.getBorrowedMap().at(vector_for_input.at(2));
+                myDB.remove_from_borrowdMap(vector_for_input.at(2));//remove borrower from borrow map
+                send(vector_for_input.at(1), "Returning " + vector_for_input.at(2) + " to " + loaner_name);
+                break;
+            }
+            case GENRE: {
+                send(vector_for_input.at(1), "book status");
+                break;
+            }
+            case LOGOUT: {
+                receipt_vec.push_back("DISCONNECT");
+                receiptId = myDB.getRecIdAndInc();
+                myDB.add_receipt(receiptId,receipt_vec);
+                send_stomp_frame((std::string &) "DISCONNECT", "receipt:" + std::to_string(receiptId) + "\n\n");
+                break;
+            }
+            default: //TODO: should choose what to do in case invalid msg header recieved
+                break;
+        }
+
+
+    }
+
 
 }
 
@@ -237,12 +357,12 @@ int Protocol::getOpcode(std::string st) {
 
 void Protocol::send(std::string topic, std::string body) {
     std::string toSend;
-    toSend="SEND\n destination:" + topic + "\n\n" + body + "\n\0";
+    toSend="SEND\n destination:" + topic + "\n\n" + body + "\n"+'\0';
     handler.sendLine(toSend);
 }
 void Protocol::send_stomp_frame(std::string header, std::string body) {
     std::string toSend;
-    toSend = header+"\n"+body+ "\n\n\0";
+    toSend = header+"\n"+body+ "\n\n"+'\0';
     handler.sendLine(toSend);
 }
 
@@ -250,95 +370,6 @@ void Protocol::send_stomp_frame(std::string header, std::string body) {
 
 
 
-void Protocol::process_keyboard(std::string &msg) {
-
-    ////////////////
-    std::string topic ;
-    int receiptId ;
-    int subID ;
-    std::string body;
-    std::vector<std::string> tmpVector;
-
-    std::string loaner_name;
-    std::vector<std::string> receipt_vec;
-    std::string send_string;
-    /////////////
-
-    std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
-    if (vector_for_input.empty() ){printf("ERROR: invalid input\n");} //test purpose only
-    else{
-        int actionName = getOpcode(vector_for_input.at(0)); //checks first word in input
-        switch(actionName) {
-            case LOGIN:
-                //assumption: already logged in
-                printf("ERROR: Already logged in!\n");//TODO: should be in STOMP format?
-
-                break;
-            case JOIN:
-                topic = vector_for_input.at(1);
-                receiptId = myDB.getRecIdAndInc();
-                subID = myDB.getSubIdAndInc();
-
-                send_stomp_frame("SUBSCRIBE","destination:" + topic + "\nid:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId) );
-                tmpVector.push_back("SUBSCRIBE");
-                tmpVector.push_back(vector_for_input.at(1));
-                //insert to maps:
-                myDB.getReceiptMap().insert(std::make_pair(receiptId, tmpVector)); //TODO: fix problem
-                myDB.getMyTopics().insert(std::make_pair(topic, subID));
-
-                //TODO: not finished! notice
-
-
-                break;
-            case EXIT:
-                subID = myDB.getMyTopics().at(vector_for_input.at(1));
-                receiptId = myDB.getRecIdAndInc();
-                send_stomp_frame("UNSUBSCRIBE","id:"+ std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId));
-                //TODO: ALON is the order of id and receipt important?
-
-                tmpVector.push_back("UNSUBSCRIBE");
-                tmpVector.push_back(vector_for_input.at(1));
-                myDB.getReceiptMap().insert(std::make_pair(receiptId,tmpVector)); //TODO: fix problem
-                if (myDB.getMyTopics().count(vector_for_input.at(1)) == 1) { //TODO ALON: CHECK!
-                    myDB.getMyTopics().erase(vector_for_input.at(1));
-                }
-
-                break;
-            case ADD_BOOK:
-                vector_for_input.at(2) = unify_book_name(vector_for_input); //get unified by - book name
-                myDB.add_book_to_Inv(vector_for_input.at(2),vector_for_input.at(1));
-                send(vector_for_input.at(1),myDB.getMyName() +" has added the book " + vector_for_input.at(2));
-                break;
-            case BORROW:
-                myDB.getWishList().push_back(vector_for_input.at(2)); //add to my wish-list
-                send(vector_for_input.at(1),myDB.getMyName()+" wish to borrow "+vector_for_input.at(2));
-                break;
-            case RETURN:
-                myDB.remove_book_from_Inv(vector_for_input.at(2),vector_for_input.at(1)); //remove from my inv
-                loaner_name = myDB.getBorrowedMap().at(vector_for_input.at(2));
-                myDB.getBorrowedMap().erase(vector_for_input.at(2)); //remove borrower from borrow map
-                send(vector_for_input.at(1),"Returning "+vector_for_input.at(2)+" to " + loaner_name);
-                break;
-            case GENRE:
-                send(vector_for_input.at(1), "book status");
-                //TODO: ALON is there suppose to be anything else?
-
-                break;
-            case LOGOUT:
-                receipt_vec.push_back("DISCONNECT");
-                receiptId = myDB.getRecIdAndInc(),
-                myDB.getReceiptMap().insert(std::make_pair(receiptId,receipt_vec));
-                send_stomp_frame((std::string &) "DISCONNECT","receipt:" + std::to_string(receiptId) + "\n\n");
-                break;
-            default: //TODO: should choose what to do in case invalid msg header recieved
-                break;
-        }
-
-
-    }
-
-
-}
 
 std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
     std::string output=vec.at(2);

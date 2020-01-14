@@ -13,7 +13,7 @@
 class ServerListenerTask {
 private:
     ConnectionHandler& handler;
-    Protocol& protocol; //TODO: impelmet protocol
+    Protocol& protocol;
     ClientDB& db;
     std::string name;
 public:

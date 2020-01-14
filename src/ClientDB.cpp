@@ -45,16 +45,13 @@
         ClientDB::borrowedMap = borrowedMap;
     }
 
-    void ClientDB::initialize(std::string &name) {
-
-    }
-
  std::unordered_map<int, std::vector<std::string>> ClientDB::getReceiptMap()  {
     return receiptMap;
 }
 
 void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
-    //TODO ALON: check if cause errors
+    std::lock_guard<std::mutex> lock(inv_lock); //lock sending
+
     std::vector<std::string> books = myInventory.at(topic);
 
     if(myInventory.count(topic)==0) {
@@ -71,6 +68,8 @@ void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
         books.push_back(book); //insert book only if not there already
 }
 bool ClientDB::remove_book_from_Inv(std::string book,std::string topic) {
+    std::lock_guard<std::mutex> lock(inv_lock); //lock sending
+
     std::vector<std::string> books = myInventory.at(topic);
     for(int i=0;i<books.size();i++){
         if(book==books.at(i)){
@@ -80,7 +79,15 @@ bool ClientDB::remove_book_from_Inv(std::string book,std::string topic) {
     }
     return false;
 }
-bool ClientDB::remove_book_from_wishList(std::string book,std::string topic) {;
+std::vector<std::string> ClientDB::get_topic_books(std::string topic) {
+    std::lock_guard<std::mutex> lock(inv_lock); //lock
+    return myInventory.at(topic);
+}
+
+bool ClientDB::remove_book_from_wishList(std::string book) {;
+    std::lock_guard<std::mutex> lock(wish_lock); //lock sending
+
+
     for(int i=0;i<wishList.size();i++){
         if(book==wishList.at(i)){
             wishList.erase(wishList.begin()+i); //TODO: hope this works
@@ -90,7 +97,75 @@ bool ClientDB::remove_book_from_wishList(std::string book,std::string topic) {;
     return false;
 }
 
+void ClientDB::add_book_to_wishList(std::string book) {
+    std::lock_guard<std::mutex> lock(wish_lock); //lock sending
 
+    wishList.push_back(book);
+}
+bool ClientDB::wishList_contains(const std::string& book) {
+    std::lock_guard<std::mutex> lock(wish_lock); //lock
+    for(std::string b: wishList){
+        if(b==book)
+            return true;
+    }
+    return false;
+}
+
+
+
+bool ClientDB::remove_from_borrowdMap(std::string book) {
+    std::lock_guard<std::mutex> lock(borrow_lock); //lock sending
+
+    if(borrowedMap.count(book)==0)
+        return false;
+    else{
+        borrowedMap.erase(book);
+        return true;
+    }
+}
+
+void ClientDB::add_book_to_borrowdMap(std::string book ,std::string loaner_name ) {
+    std::lock_guard<std::mutex> lock(borrow_lock); //lock sending
+
+    borrowedMap.insert(std::make_pair(book, loaner_name));
+    //add to map
+}
+std::string ClientDB::get_loaner_name(std::string book) {
+    std::lock_guard<std::mutex> lock(borrow_lock); //lock
+    return borrowedMap.at(book);
+}
+
+
+void ClientDB::add_receipt(int receiptID, std::vector<std::string> reciptInfo) {
+    std::lock_guard<std::mutex> lock(receipt_lock); //lock sending
+
+    receiptMap.insert(std::make_pair(receiptID, reciptInfo));
+
+}
+
+std::vector<std::string> ClientDB::get_receipt_info(int receiptID) {
+    std::lock_guard<std::mutex> lock(receipt_lock); //lock sending
+
+    return receiptMap.at(receiptID);
+}
+
+void ClientDB::remove_from_myTopics(std::string topic) {
+    std::lock_guard<std::mutex> lock(topic_lock); //lock
+
+    myTopics.erase(topic);
+}
+
+void ClientDB::add_to_myTopics(std::string topic , int subID) {
+    std::lock_guard<std::mutex> lock(topic_lock); //lock
+
+    myTopics.insert(std::make_pair(topic, subID));
+}
+
+int ClientDB::get_subscription_id(std::string topic) {
+    std::lock_guard<std::mutex> lock(topic_lock); //lock
+
+    return myTopics.at(topic);
+}
 
 void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
     ClientDB::isShouldTerminate = isShouldTerminate;
@@ -103,7 +178,8 @@ bool ClientDB::getIsShouldTerminate1() const {
 
 
 
-ClientDB::ClientDB(): isShouldTerminate(false), myName(), isActive(false), myInventory(), borrowedMap(), receiptMap(),receiptNumCounter(0), subscriptionId(0) {
+ClientDB::ClientDB(): isShouldTerminate(false), myName(), isActive(false), myInventory(), borrowedMap(), receiptMap(),receiptNumCounter(0), subscriptionId(0),wish_lock(),
+                        inv_lock(),borrow_lock(),receipt_lock(),topic_lock() {
     //TODO: REMEMBER TO update due to more fields added
     //TODO: check if DB holds an instance of protocol
 }
@@ -122,6 +198,7 @@ int ClientDB::getRecIdAndInc() {
 
 
 bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //returns true if client has book in Inv
+    std::lock_guard<std::mutex> lock(inv_lock); //lock
     std::vector<std::string> books = myInventory.at(topic);
     for(std::string b: books)
         if(book==b){
@@ -131,14 +208,6 @@ bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //retur
 }
 
 
-bool ClientDB::wishList_contains(const std::string& book) {
-    for(std::string b: wishList){
-        if(b==book)
-            return true;
-    }
-    return false;
-}
-
 
 std::unordered_map<std::string, int > ClientDB::getMyTopics()  {
     return myTopics;
@@ -147,6 +216,16 @@ std::unordered_map<std::string, int > ClientDB::getMyTopics()  {
 std::vector<std::string> &ClientDB::getWishList() {
     return wishList;
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
