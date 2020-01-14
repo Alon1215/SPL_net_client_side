@@ -143,10 +143,9 @@ void ClientDB::add_receipt(int receiptID, std::vector<std::string> reciptInfo) {
 
 }
 
-std::vector<std::string> ClientDB::get_receipt_info(int receiptID) {
+std::vector<std::string> &ClientDB::get_receipt_info(int receiptID) {
     std::lock_guard<std::mutex> lock(receipt_lock); //lock sending
-
-    return receiptMap.at(receiptID);
+    return  receiptMap.at(receiptID);
 }
 
 void ClientDB::remove_from_myTopics(std::string topic) {

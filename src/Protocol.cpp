@@ -18,6 +18,7 @@ enum string_code{
 Protocol::Protocol(ClientDB& db, ConnectionHandler& handler): myDB(db) , handler(handler) {}
 
 void Protocol::process_server(std::string &msg) {
+    printf("inside proccess server\n");
     std::vector<std::string> result; //vector of all lines in input msg
     std::vector<std::string> parse_vec;
     std::vector<std::string> mission_info;
@@ -33,11 +34,13 @@ void Protocol::process_server(std::string &msg) {
     int opcode3;
     switch(opcode) {
         case connected: {
+            printf("inside servermsg-connected\n");
             myDB.setIsActive(true);
             std::cout << "Successfully connected to Server!..\n" << std::endl;
             break;
         }
         case message: {
+            printf("inside servermsg-message\n");
             boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
             opcode2 = getOpcode(parse_vec.at(0)); //get first word code
             switch (opcode2) {
@@ -54,6 +57,7 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 }
                 case bookstatus: {
+                    printf("inside servermsg-bookstatus\n");
                     body = myDB.getMyName() + ":";
                     boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                     topic = parse_vec.at(1);
@@ -65,6 +69,7 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 }
                 case returning: {
+                    printf("inside servermsg-returning\n");
                     if (parse_vec.size() >= 4 &&
                         parse_vec.at(3) == myDB.getMyName()) { //if book is being returned to me
                         book = parse_vec.at(1);
@@ -76,10 +81,12 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 }
                 default: {
+                    printf("inside servermsg-default\n");
                     opcode3 = getOpcode(parse_vec.at(1));
                     book = parse_vec.at(4); //TODO:maybe move back to avoid double code
                     switch (opcode3) {
                         case wish: {
+                            printf("inside servermsg-wish\n");
 
                             if (myDB.inv_contains_book(book, topic)) {
                                 send(topic, myDB.getMyName() + " has " + book); //if i have this book send has frame
@@ -87,6 +94,7 @@ void Protocol::process_server(std::string &msg) {
                             break;
                         }
                         case has: {
+                            printf("inside servermsg-has\n");
                             other_name = parse_vec.at(0);
                             if (myDB.getMyName() != other_name) { //act only if this isn't my message
                                 boost::split(parse_vec, result.at(3), boost::is_any_of(
@@ -103,6 +111,7 @@ void Protocol::process_server(std::string &msg) {
                             break;
                         }
                         default: { // someone sent me a book status, i shall print it!
+                            printf("inside servermsg-double default - print status\n");
                             body = result.at(5);
                             std::cout << fix_body(body) << std::endl; //print status
                             break;
@@ -116,13 +125,14 @@ void Protocol::process_server(std::string &msg) {
             break;
         }
         case receipt: {
+            printf("inside servermsg-receipt\n");
             boost::split(parse_vec, result.at(1), boost::is_any_of(":"));
             receipt_num = stoi(parse_vec.at(1)); //get receipt number
-            myDB.get_receipt_info(receipt_num);
-            //mission_info = myDB.getReceiptMap().at(receipt_num);
+            mission_info  = myDB.get_receipt_info(receipt_num);
             opcode2 = getOpcode(mission_info.at(0)); //get the type of my receipt message
             switch (opcode2) {
                 case disconnect: {
+                    printf("inside servermsg-disconnect\n");
                     myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
                     myDB.setIsShouldTerminate(true);
                     handler.close(); //close the socket
@@ -130,20 +140,21 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 }
                 case subscribe: {
-
+                    printf("inside servermsg-subscribe\n");
                     myDB.add_to_myTopics(mission_info.at(1),stoi(mission_info.at(2)));
                     std::cout << "Joined club "
                               << mission_info.at(1) << std::endl;
                     break;
                 }
                 case unsubscribe: {
+                    printf("inside servermsg-unsubscribe\n");
                     myDB.remove_from_myTopics(mission_info.at(1));
                     std::cout << "Exited club "
                               << mission_info.at(1) << std::endl;
                     break;
                 }
                 default:{
-                    std::cout << result.at(5) << std::endl; //print what happened, for testing purposes
+                    std::cout <<"processing default case:" + result.at(5) << std::endl; //print what happened, for testing purposes
                     break;
                 }
             }
@@ -158,6 +169,7 @@ void Protocol::process_server(std::string &msg) {
             break;
         }
         default: { //TODO: should choose what to do in case invalid msg header recieved
+
             break;
         }
     }
@@ -252,8 +264,10 @@ void Protocol::process_keyboard(std::string &msg) {
                 send_stomp_frame((std::string &) "DISCONNECT", "receipt:" + std::to_string(receiptId) + "\n\n");
                 break;
             }
-            default: //TODO: should choose what to do in case invalid msg header recieved
+            default: { //TODO: should choose what to do in case invalid msg header recieved
+                printf("invalid keyboard input,try again stupid\n");
                 break;
+            }
         }
 
 
@@ -316,7 +330,7 @@ int Protocol::getOpcode(std::string st) {
         return message;
     if(st=="DISCONNECT")
         return disconnect;
-    if(st=="SUBSCCRIBE")
+    if(st=="SUBSCRIBE")
         return subscribe;
     if(st=="UNSUBSCRIBE")
         return unsubscribe;

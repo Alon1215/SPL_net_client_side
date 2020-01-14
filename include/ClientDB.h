@@ -75,7 +75,7 @@ public:
 
     void add_receipt(int receiptID, std::vector<std::string> receiptInfo);
 
-    std::vector<std::string> get_receipt_info(int receiptID);
+    std::vector<std::string> &get_receipt_info(int receiptID);
 
     void remove_from_myTopics(std::string topic);
 

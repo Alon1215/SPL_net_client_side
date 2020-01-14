@@ -15,6 +15,7 @@ int main () {
 
         //handle the login (first command):
         std::string input_string;
+        printf("please enter login command \n"); //for us
         getline(std::cin, input_string);
         std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
 
@@ -63,7 +64,7 @@ int main () {
 
             aProtocol.send_stomp_frame("CONNECT", "accept-version:1.2 \n"
                                       "host:stomp.cs.bgu.ac.il \n"
-                                      "login:"+myName+"\n "
+                                      "login:"+myName+"\n"
                                                       "password:" += password);
             printf("Sent Connect frame to server\n");
             std::thread th2(std::ref(keyBoardListenerTask)); //TODO: Check if ok
