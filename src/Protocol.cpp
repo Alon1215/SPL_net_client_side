@@ -389,7 +389,7 @@ void Protocol::send(std::string topic, std::string body) {
 }
 void Protocol::send_stomp_frame(std::string header, std::string body) {
     std::string toSend;
-    toSend = header+"\n"+body+ "\n\n"+'\0';
+    toSend = header+"\n\n"+body+ "\n"+'\0';
     handler.sendLine(toSend);
 }
 

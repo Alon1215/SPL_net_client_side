@@ -184,7 +184,7 @@ bool ClientDB::is_inv_contains_topic(std::string topic) {
 
 void ClientDB::add_topic_to_inv(std::string topic) {
     std::lock_guard<std::mutex> lock(inv_lock); //lock sending
-    myInventory.insert(std::make_pair(topic, std::vector<std::string>)); //TODO: ALON 14.1 1530 need to fix
+    myInventory.insert(std::make_pair(topic, std::vector<std::string>())); //TODO: ALON 14.1 1530 need to fix
 }
 
 // -----------------
