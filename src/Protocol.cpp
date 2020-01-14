@@ -12,7 +12,7 @@
 enum string_code{
     connected,receipt,message,error,
     disconnect,subscribe,unsubscribe, //receipt cases
-    returning, bookstatus,taking,has,wish,status,  //message cases
+    returning, bookstatus,taking,has,wish,  //message cases
     LOGIN, JOIN, EXIT, ADD_BOOK, BORROW, RETURN, STATUS, LOGOUT //for keyboard
 
 };
