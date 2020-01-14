@@ -57,7 +57,7 @@ void Protocol::process_server(std::string &msg) {
 
                     break;
                 }
-                case bookstatus: {
+                case bookstatus: { //this is the case where you send your book status to all subscribers in genre
                     printf("inside servermsg-bookstatus\n");
                     body = myDB.getMyName() + ":";
                     boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
