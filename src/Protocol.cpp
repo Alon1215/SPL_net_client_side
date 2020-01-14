@@ -141,7 +141,13 @@ void Protocol::process_server(std::string &msg) {
                 }
                 case subscribe: {
                     printf("inside servermsg-subscribe\n");
-                    myDB.add_to_myTopics(mission_info.at(1),stoi(mission_info.at(2)));
+                    std::string theTopic = mission_info.at(2);
+                    myDB.add_to_myTopics(mission_info.at(1),stoi(theTopic));
+
+                    if(myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
+                        myDB.add_topic_to_inv(theTopic);
+                    }
+
                     std::cout << "Joined club "
                               << mission_info.at(1) << std::endl;
                     break;
@@ -234,8 +240,14 @@ void Protocol::process_keyboard(std::string &msg) {
                 break;
             }
             case ADD_BOOK: {
-                vector_for_input.at(2) = unify_book_name(vector_for_input); //get unified by - book name
-                myDB.add_book_to_Inv(vector_for_input.at(2), vector_for_input.at(1));
+                vector_for_input.at(2) = unify_book_name(vector_for_input); //get unified by - book name //TODO: WHAT HAPPENS HERE?
+                std::string theTopic = vector_for_input.at(1); // the topic of the book
+
+                if(myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
+                    myDB.add_topic_to_inv(theTopic);
+                }
+
+                myDB.add_book_to_Inv(vector_for_input.at(2), theTopic);
                 send(vector_for_input.at(1), myDB.getMyName() + " has added the book " + vector_for_input.at(2));
                 break;
             }

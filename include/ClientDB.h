@@ -96,7 +96,12 @@ public:
     int get_subscription_id(std::string topic);
 
     std::vector<std::string> get_topic_books(std::string topic);
+
     std::string get_loaner_name(std::string book);
+
+    bool is_inv_contains_topic(std::string topic);
+
+    void add_topic_to_inv(std::string topic);
 
     //constructor:
     ClientDB();

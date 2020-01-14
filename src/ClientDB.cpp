@@ -49,6 +49,8 @@
     return receiptMap;
 }
 
+//------ methods which use lockers:
+
 void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
     std::lock_guard<std::mutex> lock(inv_lock); //lock sending
 
@@ -166,6 +168,27 @@ int ClientDB::get_subscription_id(std::string topic) {
     return myTopics.at(topic);
 }
 
+bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //returns true if client has book in Inv
+    std::lock_guard<std::mutex> lock(inv_lock); //lock
+    std::vector<std::string> books = myInventory.at(topic);
+    for(std::string b: books)
+        if(book==b){
+            return true;
+        }
+    return false;
+}
+
+bool ClientDB::is_inv_contains_topic(std::string topic) {
+    return myInventory.count(topic) == 0;
+}
+
+void ClientDB::add_topic_to_inv(std::string topic) {
+    std::lock_guard<std::mutex> lock(inv_lock); //lock sending
+    myInventory.insert(std::make_pair(topic, std::vector<std::string>)); //TODO: ALON 14.1 1530 need to fix
+}
+
+// -----------------
+
 void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
     ClientDB::isShouldTerminate = isShouldTerminate;
 }
@@ -173,9 +196,6 @@ void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
 bool ClientDB::getIsShouldTerminate1() const {
     return isShouldTerminate;
 }
-
-
-
 
 ClientDB::ClientDB(): isShouldTerminate(false), myName(), isActive(false), myInventory(), borrowedMap(), receiptMap(),receiptNumCounter(0), subscriptionId(0),wish_lock(),
                         inv_lock(),borrow_lock(),receipt_lock(),topic_lock() {
@@ -195,19 +215,6 @@ int ClientDB::getRecIdAndInc() {
     return receiptNumCounter - 1;
 }
 
-
-bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //returns true if client has book in Inv
-    std::lock_guard<std::mutex> lock(inv_lock); //lock
-    std::vector<std::string> books = myInventory.at(topic);
-    for(std::string b: books)
-        if(book==b){
-            return true;
-        }
-    return false;
-}
-
-
-
 std::unordered_map<std::string, int > ClientDB::getMyTopics()  {
     return myTopics;
 }
@@ -215,6 +222,8 @@ std::unordered_map<std::string, int > ClientDB::getMyTopics()  {
 std::vector<std::string> &ClientDB::getWishList() {
     return wishList;
 }
+
+
 
 
 
