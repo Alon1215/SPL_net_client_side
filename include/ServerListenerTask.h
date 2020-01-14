@@ -23,21 +23,6 @@ public:
 
 };
 
-//class KeyboardTask {
-//private:
-//    Packet* packet;
-//    Protocol* protocol;
-//    ConnectionHandler* connectionHandler;
-//    int* loggedin;
-//public:
-//    KeyboardTask(ConnectionHandler *conHand,Protocol* aProtocol,int* loggedin); TODO::delete
-//    KeyboardTask(const KeyboardTask& other);
-//    std:: vector<std::string> split(std::string s,std:: string delimiter);
-//    void operator()();
-//    virtual ~KeyboardTask();
-//    KeyboardTask& operator=(const KeyboardTask& other);
-//};
-
 
 
 #endif //SPL_NET_CLIENT_SERVERLISTENERTASK_H

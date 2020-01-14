@@ -12,9 +12,10 @@ void ServerListenerTask::operator()() {
     while(db.getIsShouldTerminate1()){ //
         std::string inMsg;
         if(!handler.getLine(inMsg)){
-            db.setIsActive(false);
+            db.setIsShouldTerminate(true);
             break;
         }
+        protocol.process_server(inMsg);
     }
 }
 

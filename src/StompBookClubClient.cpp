@@ -69,6 +69,7 @@ int main () {
                                       "host:stomp.cs.bgu.ac.il \n"
                                       "login:"+myName+"\n "
                                                       "password:" += password);
+            printf("Sent Connect frame to server\n");
             std::thread th2(std::ref(keyBoardListenerTask)); //TODO: Check if ok
 
             //now client is up and running. waits until logged out:

@@ -6,13 +6,15 @@
 KeyboardListenerTask::KeyboardListenerTask(ConnectionHandler &handler, std::string name, ClientDB &db,Protocol &protocol) : handler(handler), name(name), db(db),protocol(protocol){}
 
 void KeyboardListenerTask::operator()() {
-    bool shouldTerminate = db.getIsShouldTerminate1();
 
     //aProtocol.send("CONNECT", "version:1.2\n\n^@"); //TODO: check if ^@ or \0
-    while(!shouldTerminate){ //TODO: change to bool in db
+    while(!db.getIsShouldTerminate1()){ //TODO: change to bool in db
+        printf("listener task operating");
         std::string input_string;
         getline(std::cin, input_string);
-        if (!db.getIsActive()){printf("ERROR: not logged in yet!\n"); }//TODO: should be in STOMP format?
+        if (!db.getIsActive()){
+            printf("ERROR: not logged in yet!\n");  //TODO: should be in STOMP format?
+        }
 
         else{
             protocol.process_keyboard(input_string);

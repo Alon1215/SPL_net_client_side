@@ -132,7 +132,7 @@ void Protocol::process_server(std::string &msg) {
         case error:
             std::cout << "Error occured \n: "
                       << msg << std::endl;
-            myDB.setIsShouldTerminate(false);
+            myDB.setIsShouldTerminate(true);
             myDB.setIsActive(false);
             handler.close();
 
