@@ -19,6 +19,7 @@ private:
     std::string unify_book_name(std::vector<std::string> &vec);
 //    std::string unify_book_name_borrow(std::vector<std::string> &vec);
     std::string fix_body(std::string &body);
+    std::string fix_book_name(std::string book);
 
 
 public:
@@ -31,6 +32,7 @@ public:
     void send_stomp_frame (std::string header, std::string body);
 
 };
+
 
 //
 #endif //SPL_NET_CLIENT_PROTOCOL_H

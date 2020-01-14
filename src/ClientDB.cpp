@@ -54,7 +54,7 @@
 void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
     std::lock_guard<std::mutex> lock(inv_lock); //lock sending
 
-    std::vector<std::string> books = myInventory.at(topic);
+    std::vector<std::string> &books = myInventory.at(topic);
 
     if(myInventory.count(topic)==0) {
         myInventory.insert(std::make_pair(topic,std::vector<std::string>()));
@@ -187,6 +187,20 @@ void ClientDB::add_topic_to_inv(std::string topic) {
     std::lock_guard<std::mutex> lock(inv_lock); //lock sending
     myInventory.insert(std::make_pair(topic, std::vector<std::string>())); //TODO: ALON 14.1 1530 need to fix
 }
+//std::string ClientDB::status_make(std::string topic) {
+//    std::string status = myName+":";
+//    std::lock_guard<std::mutex> lock(inv_lock); //lock
+//    if(myInventory.count(topic)==1){
+//        std::vector<std::string> &books = myInventory.at(topic);
+//        for(std::string book:books){
+//            myName+=book;
+//
+//        }
+//    }
+//}
+
+
+
 
 // -----------------
 
@@ -223,7 +237,6 @@ std::unordered_map<std::string, int > ClientDB::getMyTopics()  {
 std::vector<std::string> &ClientDB::getWishList() {
     return wishList;
 }
-
 
 
 

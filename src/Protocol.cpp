@@ -6,13 +6,14 @@
 #include "../include/Protocol.h"
 #include "../include/connectionHandler.h"
 #include <bits/stdc++.h>
+#include <bits/stdc++.h>
 #include <boost/algorithm/string.hpp>
 
 enum string_code{
     connected,receipt,message,error,
     disconnect,subscribe,unsubscribe, //receipt cases
-    returning, bookstatus,taking,has,wish,  //message cases
-    LOGIN, JOIN, EXIT, ADD_BOOK, BORROW, RETURN, GENRE, LOGOUT //for keyboard
+    returning, bookstatus,taking,has,wish,status,  //message cases
+    LOGIN, JOIN, EXIT, ADD_BOOK, BORROW, RETURN, STATUS, LOGOUT //for keyboard
 
 };
 Protocol::Protocol(ClientDB& db, ConnectionHandler& handler): myDB(db) , handler(handler) {}
@@ -63,7 +64,7 @@ void Protocol::process_server(std::string &msg) {
                     topic = parse_vec.at(1);
                     books = myDB.get_topic_books(topic);
                     for (std::string book: books)
-                        body = body + book + ",";
+                        body = body + fix_book_name(book) + ",";
 
                     send(topic, body);//send frame
                     break;
@@ -83,10 +84,13 @@ void Protocol::process_server(std::string &msg) {
                 //
                 default: {
                     printf("inside servermsg-default\n");
-                    opcode3 = getOpcode(parse_vec.at(1));
-                    book = parse_vec.at(4); //TODO:maybe move back to avoid double code
+                    if(parse_vec.size()>1)
+                        opcode3 = getOpcode(parse_vec.at(1));
+                    else
+                        opcode3 = -1; //TODO: Ofer: added because in case of status(printing it) (or maybe invalid msg?) parse_vec will have only 1 cell, check that it won't cause bugs
                     switch (opcode3) {
                         case wish: {
+                            book = parse_vec.at(4); //TODO:maybe move back to avoid double code
                             std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+'\n'+fix_body(result.at(5))<<std::endl;
                             boost::split(parse_vec, result.at(3), boost::is_any_of(":"));
                             topic = parse_vec.at(1);
@@ -100,6 +104,7 @@ void Protocol::process_server(std::string &msg) {
                                 std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+'\n'+fix_body(result.at(5))<<std::endl;
                             }
                             else {
+                                book = parse_vec.at(4); //TODO:maybe move back to avoid double code
                                 printf("inside servermsg-has\n");
                                 other_name = parse_vec.at(0);
                                 if (myDB.getMyName() != other_name) { //act only if this isn't my message
@@ -117,11 +122,10 @@ void Protocol::process_server(std::string &msg) {
                             }
                             break;
                         }
-                        default: { // someone sent me a book status, i shall print it!
-                            printf("inside servermsg-double default - print status\n");
-                            body = result.at(5);
-                            std::cout << fix_body(body) << std::endl; //print status
-                            break;
+
+                        default:{ //print msg (should be someone's book status)
+                            std::cout << msg  << std::endl;
+
                         }
 
                     }
@@ -273,8 +277,8 @@ void Protocol::process_keyboard(std::string &msg) {
                 send(vector_for_input.at(1), "Returning " + vector_for_input.at(2) + " to " + loaner_name);
                 break;
             }
-            case GENRE: {
-                send(vector_for_input.at(1), "book status");
+            case STATUS: {
+                send(vector_for_input.at(1), "Book status");
                 break;
             }
             case LOGOUT: {
@@ -354,7 +358,7 @@ int Protocol::getOpcode(std::string st) {
         return subscribe;
     if(st=="UNSUBSCRIBE")
         return unsubscribe;
-    if(st=="BOOK")
+    if(st=="Book")
         return bookstatus;
     if(st=="RETURNING")
         return returning;
@@ -366,7 +370,6 @@ int Protocol::getOpcode(std::string st) {
         return wish;
     if(st=="has")
         return has;
-
     //for keyboard:
     if(st=="login")
         return LOGIN;
@@ -381,7 +384,7 @@ int Protocol::getOpcode(std::string st) {
     if(st=="return")
         return RETURN;
     if(st=="status")
-        return GENRE;
+        return STATUS;
     if(st=="logout")
         return LOGOUT;
 
@@ -429,6 +432,18 @@ std::string Protocol::fix_body(std::string &body) {
     }
     return toPrint;
 }
+
+std::string Protocol::fix_book_name(std::string book) {
+    std::string fixed_book;
+    for(char c:book){
+        if(c=='-')
+            fixed_book+=' ';
+        else
+            fixed_book+=c;
+    }
+    return fixed_book;
+}
+
 
 
 

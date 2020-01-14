@@ -103,6 +103,8 @@ public:
 
     void add_topic_to_inv(std::string topic);
 
+//    std::string status_make(std::string topic);
+
     //constructor:
     ClientDB();
 
