@@ -140,7 +140,7 @@ std::string ClientDB::get_loaner_name(std::string book) {
 
 void ClientDB::add_receipt(int receiptID, std::vector<std::string> reciptInfo) {
     std::lock_guard<std::mutex> lock(receipt_lock); //lock sending
-
+    //TODO:problem here with adding with correct key
     receiptMap.insert(std::make_pair(receiptID, reciptInfo));
 
 }
@@ -170,12 +170,13 @@ int ClientDB::get_subscription_id(std::string topic) {
 
 bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //returns true if client has book in Inv
     std::lock_guard<std::mutex> lock(inv_lock); //lock
-    std::vector<std::string> books = myInventory.at(topic);
-    for(std::string b: books)
-        if(book==b){
-            return true;
-        }
-    return false;
+    if (myInventory.count(topic) == 1) {
+        std::vector<std::string> books = myInventory.at(topic);
+        for (std::string b: books)
+            if (book == b) {
+                return true;
+            }
+    } else return false;
 }
 
 bool ClientDB::is_inv_contains_topic(std::string topic) {

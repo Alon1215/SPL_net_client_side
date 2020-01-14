@@ -87,26 +87,32 @@ void Protocol::process_server(std::string &msg) {
                     book = parse_vec.at(4); //TODO:maybe move back to avoid double code
                     switch (opcode3) {
                         case wish: {
-                            printf("inside servermsg-wish\n");
-
+                            std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+'\n'+fix_body(result.at(5))<<std::endl;
+                            boost::split(parse_vec, result.at(3), boost::is_any_of(":"));
+                            topic = parse_vec.at(1);
                             if (myDB.inv_contains_book(book, topic)) {
                                 send(topic, myDB.getMyName() + " has " + book); //if i have this book send has frame
                             }
                             break;
                         }
                         case has: {
-                            printf("inside servermsg-has\n");
-                            other_name = parse_vec.at(0);
-                            if (myDB.getMyName() != other_name) { //act only if this isn't my message
-                                boost::split(parse_vec, result.at(3), boost::is_any_of(
-                                        ":")); //get topic //TODO:check that this wont change book variable value
-                                topic = parse_vec.at(1);
-                                if (myDB.wishList_contains(book)) {
-                                    myDB.remove_book_from_wishList(book);
-                                    myDB.add_book_to_Inv(book, topic); //add the loaned book
-                                    myDB.add_book_to_borrowdMap(book,other_name);
-                                    //myDB.getBorrowedMap().insert(std::make_pair(book, other_name)); //add borrower to borrow map
-                                    send(topic, "Taking " + fix_body(book) + " from " + other_name);
+                            if(parse_vec.at(2)=="added"){
+                                std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+'\n'+fix_body(result.at(5))<<std::endl;
+                            }
+                            else {
+                                printf("inside servermsg-has\n");
+                                other_name = parse_vec.at(0);
+                                if (myDB.getMyName() != other_name) { //act only if this isn't my message
+                                    boost::split(parse_vec, result.at(3), boost::is_any_of(
+                                            ":")); //get topic //TODO:check that this wont change book variable value
+                                    topic = parse_vec.at(1);
+                                    if (myDB.wishList_contains(book)) {
+                                        myDB.remove_book_from_wishList(book);
+                                        myDB.add_book_to_Inv(book, topic); //add the loaned book
+                                        myDB.add_book_to_borrowdMap(book, other_name);
+                                        //myDB.getBorrowedMap().insert(std::make_pair(book, other_name)); //add borrower to borrow map
+                                        send(topic, "Taking " + fix_body(book) + " from " + other_name);
+                                    }
                                 }
                             }
                             break;
@@ -206,7 +212,8 @@ void Protocol::process_keyboard(std::string &msg) {
         switch(actionName) {
             case LOGIN: {
                 //assumption: already logged in
-                printf("ERROR: Already logged in!\n");//TODO: should be in STOMP format?
+                printf("ERROR: Already logged in!\n");//TODO: maybe should enable sending login msg inorder to get error from server like in instructions
+
 
                 break;
             }
@@ -241,21 +248,21 @@ void Protocol::process_keyboard(std::string &msg) {
                 break;
             }
             case ADD_BOOK: {
-                vector_for_input.at(2) = unify_book_name(vector_for_input); //get unified by - book name //TODO: WHAT HAPPENS HERE?
+                std::string bookName = unify_book_name(vector_for_input); //get unified by - book name //TODO: WHAT HAPPENS HERE?
                 std::string theTopic = vector_for_input.at(1); // the topic of the book
 
                 if(myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
                     myDB.add_topic_to_inv(theTopic);
                 }
 
-                myDB.add_book_to_Inv(vector_for_input.at(2), theTopic);
-                send(vector_for_input.at(1), myDB.getMyName() + " has added the book " + vector_for_input.at(2));
+                myDB.add_book_to_Inv(bookName, theTopic);
+                send(vector_for_input.at(1), myDB.getMyName() + " has added the book " + bookName);
                 break;
             }
             case BORROW:{
-
-                myDB.add_book_to_wishList(vector_for_input.at(2));
-                send(vector_for_input.at(1),myDB.getMyName()+" wish to borrow "+vector_for_input.at(2));
+                std::string bookName = unify_book_name(vector_for_input);
+                myDB.add_book_to_wishList(bookName);
+                send(vector_for_input.at(1),myDB.getMyName()+" wish to borrow "+bookName);
                 break;
             }
             case RETURN: {
@@ -274,7 +281,7 @@ void Protocol::process_keyboard(std::string &msg) {
                 receipt_vec.push_back("DISCONNECT");
                 receiptId = myDB.getRecIdAndInc();
                 myDB.add_receipt(receiptId,receipt_vec);
-                send_stomp_frame((std::string &) "DISCONNECT", "receipt:" + std::to_string(receiptId) + "\n\n");
+                send_stomp_frame( "DISCONNECT", "receipt:" + std::to_string(receiptId) + "\n\n");
                 break;
             }
             default: { //TODO: should choose what to do in case invalid msg header recieved
@@ -384,12 +391,12 @@ int Protocol::getOpcode(std::string st) {
 
 void Protocol::send(std::string topic, std::string body) {
     std::string toSend;
-    toSend="SEND\n destination:" + topic + "\n\n" + body + "\n"+'\0';
+    toSend="SEND\ndestination:" + topic + "\n\n" + body + "\n";
     handler.sendLine(toSend);
 }
 void Protocol::send_stomp_frame(std::string header, std::string body) {
     std::string toSend;
-    toSend = header+"\n\n"+body+ "\n"+'\0';
+    toSend = header+"\n"+body+ "\n\n";
     handler.sendLine(toSend);
 }
 
@@ -405,6 +412,12 @@ std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
     }
     return output;
 }
+//std::string Protocol::unify_book_name_borrow(std::vector<std::string> &vec) {
+//    //std::string output = vec.at()
+//}
+
+
+
 
 std::string Protocol::fix_body(std::string &body) {
     std::string toPrint;
@@ -414,9 +427,9 @@ std::string Protocol::fix_body(std::string &body) {
         else
             toPrint+=c;
     }
-
-
+    return toPrint;
 }
+
 
 
 
