@@ -71,7 +71,7 @@ void Protocol::process_server(std::string &msg) {
                     topic = parse_vec.at(1);
                     books = myDB.get_topic_books(topic);
                     for (int i=0;i<books.size();i++) {
-                        body = body + fix_book_name(book); // if it's not the last one
+                        body = body + fix_book_name(books.at(i)); // if it's not the last one
                         if(i != books.size()-1)
                             body += ", ";
                     }
