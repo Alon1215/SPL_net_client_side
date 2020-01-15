@@ -9,7 +9,7 @@ void KeyboardListenerTask::operator()() {
 
     //aProtocol.send("CONNECT", "version:1.2\n\n^@"); //TODO: check if ^@ or \0
     while(!db.getIsShouldTerminate1()){ //TODO: change to bool in db
-        printf("Keyboard  task operating");
+        printf("Keyboard  task operating\n");
         std::string input_string;
         getline(std::cin, input_string);
         if (!db.getIsActive()){

@@ -19,10 +19,13 @@ enum string_code{
 Protocol::Protocol(ClientDB& db, ConnectionHandler& handler): myDB(db) , handler(handler) {}
 
 void Protocol::process_server(std::string &msg) {
+
+    //variables to be used by cases, in order to process msg from server:
+    //-----
     printf("inside proccess server\n");
     std::vector<std::string> result; //vector of all lines in input msg
     std::vector<std::string> parse_vec;
-    std::vector<std::string> mission_info;
+    std::vector<std::string> receipt_info;
     std::vector<std::string> books;
     std::string book;
     std::string topic;
@@ -30,10 +33,14 @@ void Protocol::process_server(std::string &msg) {
     int receipt_num;
     std::string other_name;
     boost::split(result, msg, boost::is_any_of("\n"));
-    int opcode = getOpcode(result.at(0));
-    int opcode2;
-    int opcode3;
-    switch(opcode) {
+
+    //three parameters parsed from result, sorted by importance order:
+    int param_result_1 = getOpcode(result.at(0)); //name of main case to process
+    int param_result_2;
+    int param_result_3;
+    //------
+
+    switch(param_result_1) {
         case connected: {
             printf("inside servermsg-connected\n");
             myDB.setIsActive(true);
@@ -43,8 +50,8 @@ void Protocol::process_server(std::string &msg) {
         case message: {
             printf("inside servermsg-message\n");
             boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
-            opcode2 = getOpcode(parse_vec.at(0)); //get first word code
-            switch (opcode2) {
+            param_result_2 = getOpcode(parse_vec.at(0)); //get first word code
+            switch (param_result_2) {
                 case taking: {
                     if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
                         book = parse_vec.at(1);
@@ -85,10 +92,10 @@ void Protocol::process_server(std::string &msg) {
                 default: {
                     printf("inside servermsg-default\n");
                     if(parse_vec.size()>1)
-                        opcode3 = getOpcode(parse_vec.at(1));
+                        param_result_3 = getOpcode(parse_vec.at(1));
                     else
-                        opcode3 = -1; //TODO: Ofer: added because in case of status(printing it) (or maybe invalid msg?) parse_vec will have only 1 cell, check that it won't cause bugs
-                    switch (opcode3) {
+                        param_result_3 = -1; //TODO: Ofer: added because in case of status(printing it) (or maybe invalid msg?) parse_vec will have only 1 cell, check that it won't cause bugs
+                    switch (param_result_3) {
                         case wish: {
                             book = parse_vec.at(4); //TODO:maybe move back to avoid double code
                             std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+'\n'+fix_body(result.at(5))<<std::endl;
@@ -139,9 +146,9 @@ void Protocol::process_server(std::string &msg) {
             printf("inside servermsg-receipt\n");
             boost::split(parse_vec, result.at(1), boost::is_any_of(":"));
             receipt_num = stoi(parse_vec.at(1)); //get receipt number
-            mission_info  = myDB.get_receipt_info(receipt_num);
-            opcode2 = getOpcode(mission_info.at(0)); //get the type of my receipt message
-            switch (opcode2) {
+            receipt_info  = myDB.get_receipt_info(receipt_num);
+            param_result_2 = getOpcode(receipt_info.at(0)); //get the type of my receipt message
+            switch (param_result_2) {
                 case disconnect: {
                     printf("inside servermsg-disconnect\n");
                     myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
@@ -152,22 +159,22 @@ void Protocol::process_server(std::string &msg) {
                 }
                 case subscribe: {
                     printf("inside servermsg-subscribe\n");
-                    std::string theTopic = mission_info.at(2);
-                    myDB.add_to_myTopics(mission_info.at(1),stoi(theTopic));
+                    std::string theTopic = receipt_info.at(2);
+                    myDB.add_to_myTopics(receipt_info.at(1), stoi(theTopic));
 
                     if(myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
                         myDB.add_topic_to_inv(theTopic);
                     }
 
                     std::cout << "Joined club "
-                              << mission_info.at(1) << std::endl;
+                              << receipt_info.at(1) << std::endl;
                     break;
                 }
                 case unsubscribe: {
                     printf("inside servermsg-unsubscribe\n");
-                    myDB.remove_from_myTopics(mission_info.at(1));
+                    myDB.remove_from_myTopics(receipt_info.at(1));
                     std::cout << "Exited club "
-                              << mission_info.at(1) << std::endl;
+                              << receipt_info.at(1) << std::endl;
                     break;
                 }
                 default:{
@@ -196,7 +203,7 @@ void Protocol::process_server(std::string &msg) {
 
 void Protocol::process_keyboard(std::string &msg) {
 
-    ////////////////
+    //-----
     //parameters to prove the method's flow:
     std::string topic ;
     int receiptId ;
@@ -207,7 +214,7 @@ void Protocol::process_keyboard(std::string &msg) {
     std::string loaner_name;
     std::vector<std::string> receipt_vec;
     std::string send_string;
-    /////////////
+    //-----
 
     std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
     if (vector_for_input.empty() ){printf("ERROR: invalid input\n");} //test purpose only

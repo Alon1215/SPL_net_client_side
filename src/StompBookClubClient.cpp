@@ -10,12 +10,13 @@
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 */
 int main () {
-    printf("Welcome to the wap, start by log in:\n");
     while (1) {
+        printf("Welcome to the book club!\nstart by log in:\n");
+
 
         //handle the login (first command):
         std::string input_string;
-        printf("please enter login command \n"); //for us
+        //printf("please enter login command \n"); //for us TODO: delete this line
         getline(std::cin, input_string);
         std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
 
