@@ -52,7 +52,6 @@ void Protocol::process_server(std::string &msg) {
             printf("inside servermsg-message\n");
             boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
             param_result_2 = getOpcode(parse_vec.at(0)); //get first word code
-            std::cout << msg+"\n\n" << std::endl;
             switch (param_result_2) {
                 case taking: {
                     if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
@@ -195,7 +194,7 @@ void Protocol::process_server(std::string &msg) {
                       << msg << std::endl;
             myDB.setIsShouldTerminate(true);
             myDB.setIsActive(false);
-            handler.close();
+           // handler.close();
             break;
         }
         default: { //TODO: should choose what to do in case invalid msg header recieved
