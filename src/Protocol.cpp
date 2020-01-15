@@ -67,6 +67,7 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 }
                 case bookstatus: { //this is the case where you send your book status to all subscribers in genre
+                    std::cout << msg+"\n\n" << std::endl;
                     printf("inside servermsg-bookstatus\n");
                     body = myDB.getMyName() + ":";
                     boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
@@ -152,6 +153,7 @@ void Protocol::process_server(std::string &msg) {
             param_result_2 = getOpcode(receipt_info.at(0)); //get the type of my receipt message
             switch (param_result_2) {
                 case disconnect: {
+                    std::cout << msg+"\n\n" << std::endl;
                     printf("inside servermsg-disconnect\n");
                     myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
                     myDB.setIsShouldTerminate(true);
