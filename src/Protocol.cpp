@@ -135,14 +135,10 @@ void Protocol::process_server(std::string &msg) {
 
                         default:{ //print msg
                             std::cout << msg+"\n\n" << std::endl;
-
                         }
-
                     }
                 }
-
             }
-
             break;
         }
         case receipt: {
