@@ -72,7 +72,7 @@ void ClientDB::add_book_to_Inv(std::string book,std::string topic) {
 bool ClientDB::remove_book_from_Inv(std::string book,std::string topic) {
     std::lock_guard<std::mutex> lock(inv_lock); //lock sending
 
-    std::vector<std::string> books = myInventory.at(topic);
+    std::vector<std::string> &books = myInventory.at(topic);
     for(int i=0;i<books.size();i++){
         if(book==books.at(i)){
             books.erase(books.begin()+i); //TODO: hope this works
