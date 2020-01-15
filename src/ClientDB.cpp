@@ -171,7 +171,7 @@ int ClientDB::get_subscription_id(std::string topic) {
 bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //returns true if client has book in Inv
     std::lock_guard<std::mutex> lock(inv_lock); //lock
     if (myInventory.count(topic) == 1) {
-        std::vector<std::string> books = myInventory.at(topic);
+        std::vector<std::string> &books = myInventory.at(topic);
         for (std::string b: books)
             if (book == b) {
                 return true;

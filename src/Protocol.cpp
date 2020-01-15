@@ -370,9 +370,9 @@ int Protocol::getOpcode(std::string st) {
         return unsubscribe;
     if(st=="Book")
         return bookstatus;
-    if(st=="RETURNING")
+    if(st=="Returning")
         return returning;
-    if(st=="TAKING")
+    if(st=="Taking")
         return taking;
     if(st=="ERROR")
         return error;
