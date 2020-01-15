@@ -164,15 +164,15 @@ void Protocol::process_server(std::string &msg) {
                 case subscribe: {
                     std::cout << msg+"\n\n" << std::endl;
                     printf("inside servermsg-subscribe\n");
-                    std::string theTopic = receipt_info.at(2);
-                    myDB.add_to_myTopics(receipt_info.at(1), stoi(theTopic));
+                    std::string myTopic = receipt_info.at(1);
+                    myDB.add_to_myTopics(myTopic, stoi(receipt_info.at(2)));
 
-                    if(!myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
-                        myDB.add_topic_to_inv(theTopic);
+                    if(!myDB.is_inv_contains_topic(myTopic)){ //put topic in inv if absent
+                        myDB.add_topic_to_inv(myTopic);
                     }
 
                     std::cout << "Joined club "
-                              << receipt_info.at(1) << std::endl;
+                              << myTopic << std::endl;
                     break;
                 }
                 case unsubscribe: {
