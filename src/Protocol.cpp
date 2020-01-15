@@ -53,12 +53,13 @@ void Protocol::process_server(std::string &msg) {
             param_result_2 = getOpcode(parse_vec.at(0)); //get first word code
             switch (param_result_2) {
                 case taking: {
+                    std::cout << msg+"\n\n" << std::endl;
                     if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
                         book = parse_vec.at(1);
                         boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                         topic = parse_vec.at(1);
                         if (myDB.remove_book_from_Inv(book, topic)) {
-                            std::cout << "Borrowed " << fix_body(book) << std::endl;
+                            std::cout << "Borrowed\n\n " << fix_body(book) << std::endl;
                         }
                     }
 
