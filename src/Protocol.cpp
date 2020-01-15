@@ -42,6 +42,7 @@ void Protocol::process_server(std::string &msg) {
 
     switch(param_result_1) {
         case connected: {
+            std::cout << msg+"\n\n" << std::endl;
             printf("inside servermsg-connected\n");
             myDB.setIsActive(true);
             std::cout << "Successfully connected to Server!..\n" << std::endl;
@@ -51,15 +52,15 @@ void Protocol::process_server(std::string &msg) {
             printf("inside servermsg-message\n");
             boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
             param_result_2 = getOpcode(parse_vec.at(0)); //get first word code
+            std::cout << msg+"\n\n" << std::endl;
             switch (param_result_2) {
                 case taking: {
-                    std::cout << msg+"\n\n" << std::endl;
                     if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
                         book = parse_vec.at(1);
                         boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                         topic = parse_vec.at(1);
                         if (myDB.remove_book_from_Inv(book, topic)) {
-                            std::cout << "Borrowed\n\n " << fix_body(book) << std::endl;
+                            std::cout << "Borrowed" << fix_body(book)+"\n\n" << std::endl; //TODO: print for testing
                         }
                     }
 
@@ -101,6 +102,7 @@ void Protocol::process_server(std::string &msg) {
                         param_result_3 = -1; //TODO: Ofer: added because in case of status(printing it) (or maybe invalid msg?) parse_vec will have only 1 cell, check that it won't cause bugs
                     switch (param_result_3) {
                         case wish: {
+                            std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
                             book = parse_vec.at(4); //TODO:maybe move back to avoid double code
                             std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+'\n'+fix_body(result.at(5))<<std::endl;
                             boost::split(parse_vec, result.at(3), boost::is_any_of(":"));
@@ -158,6 +160,7 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 }
                 case subscribe: {
+                    std::cout << msg+"\n\n" << std::endl;
                     printf("inside servermsg-subscribe\n");
                     std::string theTopic = receipt_info.at(2);
                     myDB.add_to_myTopics(receipt_info.at(1), stoi(theTopic));
@@ -171,6 +174,7 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 }
                 case unsubscribe: {
+                    std::cout << msg+"\n\n" << std::endl;
                     printf("inside servermsg-unsubscribe\n");
                     myDB.remove_from_myTopics(receipt_info.at(1));
                     std::cout << "Exited club "
