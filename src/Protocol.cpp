@@ -111,7 +111,7 @@ void Protocol::process_server(std::string &msg) {
                         }
                         case has: {
                             if(parse_vec.at(2)=="added"){
-                                std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
+                                std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(4))+'\n'+'\n'<<std::endl;
                             }
                             else {
                                 book = parse_vec.at(2); //TODO:maybe move back to avoid double code
