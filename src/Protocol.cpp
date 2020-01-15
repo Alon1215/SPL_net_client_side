@@ -49,7 +49,7 @@ void Protocol::process_server(std::string &msg) {
         }
         case message: {
             printf("inside servermsg-message\n");
-            boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
+            boost::split(parse_vec, result.at(4), boost::is_any_of(" ")); //split message body into words
             param_result_2 = getOpcode(parse_vec.at(0)); //get first word code
             switch (param_result_2) {
                 case taking: {
