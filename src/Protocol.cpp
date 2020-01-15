@@ -281,9 +281,10 @@ void Protocol::process_keyboard(std::string &msg) {
                 else{
                     myDB.remove_book_from_Inv(vector_for_input.at(2), vector_for_input.at(1)); //remove from my inv
                     loaner_name = myDB.get_loaner_name(vector_for_input.at(2));
-                    //loaner_name = myDB.getBorrowedMap().at(vector_for_input.at(2));
-                    myDB.remove_from_borrowdMap(vector_for_input.at(2));//remove borrower from borrow map
-                    send(vector_for_input.at(1), "Returning " + vector_for_input.at(2) + " to " + loaner_name);
+                    if(loaner_name!="") {
+                        myDB.remove_from_borrowdMap(vector_for_input.at(2));//remove borrower from borrow map
+                        send(vector_for_input.at(1), "Returning " + vector_for_input.at(2) + " to " + loaner_name);
+                    }
                 }
                 break;
             }

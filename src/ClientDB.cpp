@@ -134,7 +134,9 @@ void ClientDB::add_book_to_borrowdMap(std::string book ,std::string loaner_name 
 }
 std::string ClientDB::get_loaner_name(std::string book) {
     std::lock_guard<std::mutex> lock(borrow_lock); //lock
-    return borrowedMap.at(book);
+    if(borrowedMap.count(book)==1)
+        return borrowedMap.at(book);
+    else return "";
 }
 
 
