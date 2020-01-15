@@ -16,11 +16,10 @@ int main () {
 
         //handle the login (first command):
         std::string input_string;
-        //printf("please enter login command \n"); //for us TODO: delete this line
         getline(std::cin, input_string);
         std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
 
-        if (!vector_for_input.empty() && vector_for_input.at(0) == "logout"){ break;} //TODO: ALON not sure if right, CHECK
+        if (!vector_for_input.empty() && vector_for_input.at(0) == "bye"){ break;} //exit program command
 
         while (vector_for_input.empty() || vector_for_input.at(0) != "login") {
             printf("ERROR: user is not logged in yet \ntry again: \n");
@@ -69,6 +68,8 @@ int main () {
                                                       "password:" += password);
             printf("Sent Connect frame to server\n");
             std::thread th2(std::ref(keyBoardListenerTask)); //TODO: Check if ok
+
+
 
             //now client is up and running. waits until logged out:
             th1.join();
