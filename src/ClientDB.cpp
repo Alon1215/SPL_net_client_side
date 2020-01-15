@@ -180,7 +180,8 @@ bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //retur
 }
 
 bool ClientDB::is_inv_contains_topic(std::string topic) {
-    return myInventory.count(topic) == 0;
+    std::lock_guard<std::mutex> lock(inv_lock); //lock
+    return myInventory.count(topic) == 1;
 }
 
 void ClientDB::add_topic_to_inv(std::string topic) {
