@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <condition_variable>
 #include "ClientDB.h"
 #include "connectionHandler.h"
 
@@ -21,8 +22,8 @@ private:
     std::string fix_body(std::string &body);
     std::string fix_book_name(std::string book);
 
-
 public:
+    std::condition_variable &getLogoutCondition() ;
     Protocol(ClientDB &db, ConnectionHandler &handler);
     void process_server(std::string &msg);
     void process_keyboard(std::string &msg);
@@ -31,6 +32,7 @@ public:
     void send(std::string topic,std::string body);
     void send_stomp_frame (std::string header, std::string body);
 
+    void handleExit(int subID, const std::string &topicName);
 };
 
 

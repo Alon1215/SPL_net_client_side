@@ -151,9 +151,10 @@ std::vector<std::string> &ClientDB::get_receipt_info(int receiptID) {
 }
 
 void ClientDB::remove_from_myTopics(std::string topic) {
-    std::lock_guard<std::mutex> lock(topic_lock); //lock
-
+    std::unique_lock<std::mutex> lck(topic_lock);
     myTopics.erase(topic);
+    if(wantLogout && myTopics.empty())
+        cv.notify_all();
 }
 
 void ClientDB::add_to_myTopics(std::string topic , int subID) {
@@ -214,7 +215,7 @@ bool ClientDB::getIsShouldTerminate1() const {
 }
 
 ClientDB::ClientDB(): isShouldTerminate(false), myName(), isActive(false), myInventory(), borrowedMap(), receiptMap(),receiptNumCounter(0), subscriptionId(0),wish_lock(),
-                        inv_lock(),borrow_lock(),receipt_lock(),topic_lock() {
+                        inv_lock(),borrow_lock(),receipt_lock(),topic_lock(),wantLogout(false),cv(){
     //TODO: REMEMBER TO update due to more fields added
     //TODO: check if DB holds an instance of protocol
 }
@@ -238,6 +239,24 @@ std::unordered_map<std::string, int > ClientDB::getMyTopics()  {
 std::vector<std::string> &ClientDB::getWishList() {
     return wishList;
 }
+
+bool ClientDB::isWantLogout() const {
+    return wantLogout;
+}
+
+void ClientDB::setWantLogout(bool wantLogout) {
+    ClientDB::wantLogout = wantLogout;
+}
+
+ std::mutex &ClientDB::getTopicLock()  {
+    return topic_lock;
+}
+
+ std::condition_variable &ClientDB::getCv()  {
+    return cv;
+}
+
+
 
 
 

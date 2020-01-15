@@ -180,6 +180,7 @@ void Protocol::process_server(std::string &msg) {
                     myDB.remove_from_myTopics(receipt_info.at(1));
                     std::cout << "Exited club "
                               << receipt_info.at(1) << std::endl;
+
                     break;
                 }
                 default:{
@@ -214,10 +215,7 @@ void Protocol::process_keyboard(std::string &msg) {
     int receiptId ;
     int subID ;
     std::string body;
-    std::vector<std::string> tmpVector;
-
     std::string loaner_name;
-    std::vector<std::string> receipt_vec;
     std::string send_string;
     //-----
 
@@ -234,6 +232,7 @@ void Protocol::process_keyboard(std::string &msg) {
                 break;
             }
             case JOIN: {
+                std::vector<std::string> tmpVector;
                 topic = vector_for_input.at(1);
                 receiptId = myDB.getRecIdAndInc();
                 subID = myDB.getSubIdAndInc();
@@ -250,16 +249,8 @@ void Protocol::process_keyboard(std::string &msg) {
             }
             case EXIT: {
                 subID = myDB.get_subscription_id(vector_for_input.at(1));
-                //subID = myDB.getMyTopics().at(vector_for_input.at(1));
-                receiptId = myDB.getRecIdAndInc();
-
-                tmpVector.push_back("UNSUBSCRIBE");
-                tmpVector.push_back(vector_for_input.at(1));
-                tmpVector.push_back(std::to_string(subID));
-                myDB.add_receipt(receiptId,tmpVector);
-
-                send_stomp_frame("UNSUBSCRIBE",
-                                 "id:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId));
+                std::string topicName = vector_for_input.at(1);
+                handleExit(subID, topicName);
 
                 break;
             }
@@ -298,6 +289,14 @@ void Protocol::process_keyboard(std::string &msg) {
                 break;
             }
             case LOGOUT: {
+                myDB.setWantLogout(true);
+                std::unique_lock<std::mutex> lck(myDB.getTopicLock());
+                for(std::pair<std::string,int> p:myDB.getMyTopics()){
+                    handleExit(p.second,p.first);
+                }
+                myDB.getCv().wait(lck);
+                lck.release(); //TODO: might throw error if not owned anymore
+                std::vector<std::string> receipt_vec;
                 receipt_vec.push_back("DISCONNECT");
                 receiptId = myDB.getRecIdAndInc();
                 myDB.add_receipt(receiptId,receipt_vec);
@@ -316,8 +315,17 @@ void Protocol::process_keyboard(std::string &msg) {
 
 }
 
+void Protocol::handleExit(int subID, const std::string &topicName) {
+    int receiptId = myDB.getRecIdAndInc();
 
-
+    std::vector<std::string> tmpVector;
+    tmpVector.push_back("UNSUBSCRIBE");
+    tmpVector.push_back(topicName);
+    tmpVector.push_back(std::to_string(subID));
+    myDB.add_receipt(receiptId, tmpVector);
+    send_stomp_frame("UNSUBSCRIBE",
+                     "id:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId));
+}
 
 
 std::vector<std::string> Protocol::input_to_vector(const std::string &str, char delimiter) {
