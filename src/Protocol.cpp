@@ -114,7 +114,7 @@ void Protocol::process_server(std::string &msg) {
                                 std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))<<std::endl;
                             }
                             else {
-                                book = parse_vec.at(4); //TODO:maybe move back to avoid double code
+                                book = parse_vec.at(2); //TODO:maybe move back to avoid double code
                                 printf("inside servermsg-has\n");
                                 other_name = parse_vec.at(0);
                                 if (myDB.getMyName() != other_name) { //act only if this isn't my message
