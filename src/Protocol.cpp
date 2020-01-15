@@ -54,12 +54,13 @@ void Protocol::process_server(std::string &msg) {
             param_result_2 = getOpcode(parse_vec.at(0)); //get first word code
             switch (param_result_2) {
                 case taking: {
+                    std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
                     if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
                         book = parse_vec.at(1);
                         boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                         topic = parse_vec.at(1);
                         if (myDB.remove_book_from_Inv(book, topic)) {
-                            std::cout << "Borrowed" << fix_body(book)+"\n\n" << std::endl; //TODO: print for testing
+                            std::cout << "Borrowed " << fix_body(book)+"\n\n" << std::endl; //TODO: print for testing
                         }
                     }
 
@@ -104,7 +105,6 @@ void Protocol::process_server(std::string &msg) {
                         case wish: {
                             std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
                             book = parse_vec.at(4); //TODO:maybe move back to avoid double code
-                            std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+'\n'+fix_body(result.at(5))<<std::endl;
                             boost::split(parse_vec, result.at(3), boost::is_any_of(":"));
                             topic = parse_vec.at(1);
                             if (myDB.inv_contains_book(book, topic)) {
