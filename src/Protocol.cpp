@@ -70,8 +70,11 @@ void Protocol::process_server(std::string &msg) {
                     boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                     topic = parse_vec.at(1);
                     books = myDB.get_topic_books(topic);
-                    for (std::string book: books)
-                        body = body + fix_book_name(book) + ",";
+                    for (int i=0;i<books.size();i++) {
+                        body = body + fix_book_name(book); // if it's not the last one
+                        if(i != books.size()-1)
+                            body += ", ";
+                    }
 
                     send(topic, body);//send frame
                     break;
@@ -108,7 +111,7 @@ void Protocol::process_server(std::string &msg) {
                         }
                         case has: {
                             if(parse_vec.at(2)=="added"){
-                                std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+'\n'+fix_body(result.at(5))<<std::endl;
+                                std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))<<std::endl;
                             }
                             else {
                                 book = parse_vec.at(4); //TODO:maybe move back to avoid double code
@@ -162,7 +165,7 @@ void Protocol::process_server(std::string &msg) {
                     std::string theTopic = receipt_info.at(2);
                     myDB.add_to_myTopics(receipt_info.at(1), stoi(theTopic));
 
-                    if(myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
+                    if(!myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
                         myDB.add_topic_to_inv(theTopic);
                     }
 
@@ -262,7 +265,7 @@ void Protocol::process_keyboard(std::string &msg) {
                 std::string bookName = unify_book_name(vector_for_input); //get unified by - book name //TODO: WHAT HAPPENS HERE?
                 std::string theTopic = vector_for_input.at(1); // the topic of the book
 
-                if(myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
+                if(!myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
                     myDB.add_topic_to_inv(theTopic);
                 }
 
