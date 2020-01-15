@@ -195,7 +195,6 @@ void Protocol::process_server(std::string &msg) {
                       << msg << std::endl;
             myDB.setIsShouldTerminate(true);
             myDB.setIsActive(false);
-           // handler.close();
             break;
         }
         default: { //TODO: should choose what to do in case invalid msg header recieved
@@ -225,8 +224,12 @@ void Protocol::process_keyboard(std::string &msg) {
         int actionName = getOpcode(vector_for_input.at(0)); //checks first word in input
         switch(actionName) {
             case LOGIN: {
-                //assumption: already logged in
-                printf("ERROR: Already logged in!\n");//TODO: maybe should enable sending login msg inorder to get error from server like in instructions
+                //TODO: ALON 15.1 2130 new impl
+                send_stomp_frame("CONNECT", "accept-version:1.2 \n"
+                                                      "host:stomp.cs.bgu.ac.il \n"
+                                                      "login:"+vector_for_input.at(2)+"\n"
+                                                                      "password:" += vector_for_input.at(3));
+                printf("Sent Connect frame to server\n");
 
 
                 break;
