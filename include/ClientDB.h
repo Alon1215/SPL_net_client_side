@@ -16,34 +16,38 @@ class ClientDB {
 
 private:
 
+
+    //data structures in class
     std::unordered_map<std::string, int> myTopics; // key = topic name , val = sub id
-    bool isActive;
     std::vector<std::string> wishList;
     std::unordered_map<std::string,std::vector<std::string>> myInventory; //1st = topic , 2nd = vector of books
     std::unordered_map<std::string,std::string> borrowedMap; // key = book, val = name of loaner
     std::unordered_map<int,std::vector<std::string>> receiptMap; //key=receipt num, val=vector of important info (first cell = type of msg (disconnect,subscribe,...)
-    std::condition_variable cv;
-private:
-    // second= topic (if needed),third=subscription iD
+
+    //variables in class
+    bool isActive;
     bool isShouldTerminate;
     std::string myName;
-public:
-    bool isWantLogout() const;
-    std::condition_variable &getCv() ;
-    void setWantLogout(bool wantLogout);
-
-private:
-    int receiptNumCounter; //this wil be a unique number of each receipt
+    int receiptNumCounter; //this will be a unique number of each receipt
     int subscriptionId;
+    bool wantLogout;
+    //lockers
     std::mutex wish_lock;
     std::mutex inv_lock;
     std::mutex borrow_lock;
     std::mutex receipt_lock;
     std::mutex topic_lock;
-    bool wantLogout;
+    std::condition_variable cv;
+
+
+
 
 
 public:
+    bool isWantLogout() const;
+    std::condition_variable &getCv() ;
+    void setWantLogout(bool wantLogout);
+
     bool remove_book_from_Inv(std::string book, std::string topic);
 
     std::unordered_map<int, std::vector<std::string>> getReceiptMap();
@@ -91,7 +95,6 @@ public:
     void remove_from_myTopics(std::string topic);
 
     void add_to_myTopics(std::string topic, int subID);
-
 
     void setIsShouldTerminate(bool isShouldTerminate);
 

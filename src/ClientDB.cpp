@@ -5,6 +5,14 @@
 #include "../include/ClientDB.h"
 
 
+
+
+ClientDB::ClientDB(): myTopics(), wishList(), myInventory(), borrowedMap(), receiptMap(),
+                      isActive(false), isShouldTerminate(false), myName(), receiptNumCounter(0),
+                      subscriptionId(0), wantLogout(false),
+                      wish_lock(), inv_lock(),borrow_lock(),receipt_lock(),topic_lock(),cv(){
+
+}
     bool ClientDB::getIsActive() const {
         return isActive;
     }
@@ -73,7 +81,7 @@ bool ClientDB::remove_book_from_Inv(std::string book,std::string topic) {
     std::lock_guard<std::mutex> lock(inv_lock); //lock sending
 
     std::vector<std::string> &books = myInventory.at(topic);
-    for(int i=0;i<books.size();i++){
+    for(int i=0;i< (signed) books.size();i++){
         if(book==books.at(i)){
             books.erase(books.begin()+i); //TODO: hope this works
             return true;
@@ -90,7 +98,7 @@ bool ClientDB::remove_book_from_wishList(std::string book) {;
     std::lock_guard<std::mutex> lock(wish_lock); //lock sending
 
 
-    for(int i=0;i<wishList.size();i++){
+    for(int i=0;i< (signed) wishList.size();i++){
         if(book==wishList.at(i)){
             wishList.erase(wishList.begin()+i); //TODO: hope this works
             return true;
@@ -173,13 +181,15 @@ int ClientDB::get_subscription_id(std::string topic) {
 
 bool ClientDB::inv_contains_book(std::string book, std::string topic)  { //returns true if client has book in Inv
     std::lock_guard<std::mutex> lock(inv_lock); //lock
+
     if (myInventory.count(topic) == 1) {
         std::vector<std::string> &books = myInventory.at(topic);
         for (std::string b: books)
             if (book == b) {
                 return true;
             }
-    } else return false;
+    }
+    return false;
 }
 
 bool ClientDB::is_inv_contains_topic(std::string topic) {
@@ -191,19 +201,6 @@ void ClientDB::add_topic_to_inv(std::string topic) {
     std::lock_guard<std::mutex> lock(inv_lock); //lock sending
     myInventory.insert(std::make_pair(topic, std::vector<std::string>())); //TODO: ALON 14.1 1530 need to fix
 }
-//std::string ClientDB::status_make(std::string topic) {
-//    std::string status = myName+":";
-//    std::lock_guard<std::mutex> lock(inv_lock); //lock
-//    if(myInventory.count(topic)==1){
-//        std::vector<std::string> &books = myInventory.at(topic);
-//        for(std::string book:books){
-//            myName+=book;
-//
-//        }
-//    }
-//}
-
-
 
 
 // -----------------
@@ -214,12 +211,6 @@ void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
 
 bool ClientDB::getIsShouldTerminate1() const {
     return isShouldTerminate;
-}
-
-ClientDB::ClientDB(): isShouldTerminate(false), myName(), isActive(false), myInventory(), borrowedMap(), receiptMap(),receiptNumCounter(0), subscriptionId(0),wish_lock(),
-                        inv_lock(),borrow_lock(),receipt_lock(),topic_lock(),wantLogout(false),cv(){
-    //TODO: REMEMBER TO update due to more fields added
-    //TODO: check if DB holds an instance of protocol
 }
 
 //next 2 method are returning the counter (for each one) and incrementing it:

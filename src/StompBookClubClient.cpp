@@ -4,7 +4,6 @@
 #include "../include/ClientDB.h"
 #include "../include/ServerListenerTask.h"
 #include "../include/Protocol.h"
-#include "../include/KeyboardListenerTask.h"
 
 /**
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
@@ -41,7 +40,7 @@ int main () {
             i++;
         }
         i++;
-        while (i < vector_for_input.at(1).length()) {
+        while (i < (signed) vector_for_input.at(1).length()) {
             tmpPort += vector_for_input.at(1).at(i);
             i++;
         }
@@ -66,7 +65,7 @@ int main () {
         } else {
 
             ServerListenerTask serverListenerTask(connectionHandler, myName, clientDb,aProtocol);
-            //KeyboardListenerTask keyBoardListenerTask(connectionHandler, myName, clientDb,aProtocol);
+
             std::thread th1(std::ref(serverListenerTask));
 
             aProtocol.send_stomp_frame("CONNECT", "accept-version:1.2 \n"

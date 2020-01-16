@@ -12,12 +12,10 @@ link_libraries("-lboost_system")
 add_executable(spl_net_Client
         include/connectionHandler.h
         include/ClientDB.h
-        include/KeyboardListenerTask.h
         include/Protocol.h
         include/ServerListenerTask.h
         src/connectionHandler.cpp
         src/ClientDB.cpp
-        src/KeyboardListenerTask.cpp
         src/Protocol.cpp
         src/ServerListenerTask.cpp
         src/StompBookClubClient.cpp
