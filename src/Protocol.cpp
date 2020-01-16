@@ -83,6 +83,7 @@ void Protocol::process_server(std::string &msg) {
                     break;
                 }
                 case returning: {
+                    std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
                     printf("inside servermsg-returning\n");
                     if (parse_vec.size() >= 4 &&
                         parse_vec.at(3) == myDB.getMyName()) { //if book is being returned to me
@@ -234,7 +235,7 @@ void Protocol::process_keyboard(std::string &msg) {
                 send_stomp_frame("CONNECT", "accept-version:1.2 \n"
                                                       "host:stomp.cs.bgu.ac.il \n"
                                                       "login:"+vector_for_input.at(2)+"\n"
-                                                                      "password:" += vector_for_input.at(3));
+                                                                      "passcode:" += vector_for_input.at(3));
                 printf("Sent Connect frame to server\n");
 
 
@@ -276,9 +277,11 @@ void Protocol::process_keyboard(std::string &msg) {
                 break;
             }
             case BORROW:{
-                std::string bookName = unify_book_name(vector_for_input);
-                myDB.add_book_to_wishList(bookName);
-                send(vector_for_input.at(1),myDB.getMyName()+" wish to borrow "+bookName);
+                if(vector_for_input.size()>2) {
+                    std::string bookName = unify_book_name(vector_for_input);
+                    myDB.add_book_to_wishList(bookName);
+                    send(vector_for_input.at(1), myDB.getMyName() + " wish to borrow " + bookName);
+                }
                 break;
             }
             case RETURN: {
@@ -437,7 +440,7 @@ int Protocol::getOpcode(std::string st) {
 
 void Protocol::send(std::string topic, std::string body) {
     std::string toSend;
-    toSend="SEND\ndestination:" + topic + "\n\n" + body + "\n";
+    toSend="SEND\ndestination:" + topic + "\n\n" + fix_body(body) + "\n";
     handler.sendLine(toSend);
 }
 void Protocol::send_stomp_frame(std::string header, std::string body) {

@@ -65,7 +65,7 @@ int main () {
             aProtocol.send_stomp_frame("CONNECT", "accept-version:1.2 \n"
                                       "host:stomp.cs.bgu.ac.il \n"
                                       "login:"+myName+"\n"
-                                                      "password:" += password);
+                                                      "passcode:" += password);
             printf("Sent Connect frame to server\n");
             std::thread th2(std::ref(keyBoardListenerTask)); //TODO: Check if ok
 
