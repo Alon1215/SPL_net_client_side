@@ -34,6 +34,28 @@ public:
     void handleExit(int subID, const std::string &topicName);
 
     void remove_from_all_topics();
+
+    void takingCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
+                    std::string &topic);
+
+    void bookstatusCase(const std::string &msg, std::vector<std::string> &result, std::vector<std::string> &parse_vec,
+                        std::vector<std::string> &books, std::string &topic, std::string &body);
+
+    void returningCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
+                       std::string &topic);
+
+    void
+    wishCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
+             std::string &topic);
+
+    void
+    hasCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
+            std::string &topic,
+            std::string &other_name);
+
+    void addBookCase(std::vector<std::string> &vector_for_input);
+
+    void returnCase(std::string &loaner_name, std::vector<std::string> &vector_for_input);
 };
 
 

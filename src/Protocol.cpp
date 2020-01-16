@@ -43,7 +43,6 @@ void Protocol::process_server(std::string &msg) {
     switch(param_result_1) {
         case connected: {
             std::cout << msg+"\n\n" << std::endl;
-            printf("inside servermsg-connected\n");
             myDB.setIsActive(true);
             std::cout << "Successfully connected to Server!..\n" << std::endl;
             break;
@@ -54,94 +53,36 @@ void Protocol::process_server(std::string &msg) {
             param_result_2 = getOpcode(parse_vec.at(0)); //get first word code
             switch (param_result_2) {
                 case taking: {
-                    std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
-                    bool me=false;
-                    for(std::string st:parse_vec){
-                        if(st==myDB.getMyName()){
-                            me = true;
-                            break;
-                        }
-                    }
-                    if (me) { //need to give a book
-                        book = unify_book_name_taking(parse_vec);
-                        boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
-                        topic = parse_vec.at(1);
-                        if (myDB.remove_book_from_Inv(book, topic)) {
-                            std::cout << "Borrowed " << fix_body(book)+"\n\n" << std::endl; //TODO: print for testing
-                        }
-                    }
+                    takingCase(result, parse_vec, book, topic);
 
                     break;
                 }
                 case bookstatus: { //this is the case where you send your book status to all subscribers in genre
-                    std::cout << msg+"\n\n" << std::endl;
-                    printf("inside servermsg-bookstatus\n");
-                    body = myDB.getMyName() + ":";
-                    boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
-                    topic = parse_vec.at(1);
-                    books = myDB.get_topic_books(topic);
-                    for (int i=0;(unsigned)i<books.size();i++) {
-                        body = body + fix_book_name(books.at(i)); // if it's not the last one
-                        if((unsigned)i != books.size()-1)
-                            body += ", ";
-                    }
+                    bookstatusCase(msg, result, parse_vec, books, topic, body);
 
-                    send(topic, body);//send frame
                     break;
                 }
                 case returning: {
-                    std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
-                    printf("inside servermsg-returning\n");
-                    if (parse_vec.size() >= 4 &&
-                        parse_vec.at(3) == myDB.getMyName()) { //if book is being returned to me
-                        book = parse_vec.at(1);
-                        boost::split(parse_vec, result.at(3), boost::is_any_of(
-                                ":")); //get topic //TODO:check that this wont change book variable value
-                        topic = parse_vec.at(1);
-                        myDB.add_book_to_Inv(book, topic); //take book back to inv
-                    }
+                    returningCase(result, parse_vec, book, topic);
+
                     break;
                 }
                 //
                 default: {
-                    printf("inside servermsg-default\n");
-                    if(parse_vec.size()>1)
+
+                    if(parse_vec.size() > 1)
                         param_result_3 = getOpcode(parse_vec.at(1));
                     else
-                        param_result_3 = -1; //TODO: Ofer: added because in case of status(printing it) (or maybe invalid msg?) parse_vec will have only 1 cell, check that it won't cause bugs
+                        param_result_3 = -1;
                     switch (param_result_3) {
                         case wish: {
                             std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
+                            wishCase(result, parse_vec, book, topic);
 
-                            book = unify_book_name_borrow(parse_vec);//TODO: patch of the beyoker
-                            boost::split(parse_vec, result.at(3), boost::is_any_of(":"));
-                            topic = parse_vec.at(1);
-                            if (myDB.inv_contains_book(book, topic)) {
-                                send(topic, myDB.getMyName() + " has " + book); //if i have this book send has frame
-                            }
                             break;
                         }
                         case has: {
-                            if(parse_vec.at(2)=="added"){
-                                std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
-                            }
-                            else {
-                                book = unify_book_name(parse_vec); //TODO:maybe move back to avoid double code
-                                printf("inside servermsg-has\n");
-                                other_name = parse_vec.at(0);
-                                if (myDB.getMyName() != other_name) { //act only if this isn't my message
-                                    boost::split(parse_vec, result.at(3), boost::is_any_of(
-                                            ":")); //get topic //TODO:check that this wont change book variable value
-                                    topic = parse_vec.at(1);
-                                    if (myDB.wishList_contains(book)) {
-                                        myDB.remove_book_from_wishList(book);
-                                        myDB.add_book_to_Inv(book, topic); //add the loaned book
-                                        myDB.add_book_to_borrowdMap(book, other_name);
-                                        //myDB.getBorrowedMap().insert(std::make_pair(book, other_name)); //add borrower to borrow map
-                                        send(topic, "Taking " + fix_body(book) + " from " + other_name);
-                                    }
-                                }
-                            }
+                            hasCase(result, parse_vec, book, topic, other_name);
                             break;
                         }
 
@@ -154,7 +95,7 @@ void Protocol::process_server(std::string &msg) {
             break;
         }
         case receipt: {
-            printf("inside servermsg-receipt\n");
+
             boost::split(parse_vec, result.at(1), boost::is_any_of(":"));
             receipt_num = stoi(parse_vec.at(1)); //get receipt number
             receipt_info  = myDB.get_receipt_info(receipt_num);
@@ -162,17 +103,17 @@ void Protocol::process_server(std::string &msg) {
             switch (param_result_2) {
                 case disconnect: {
                     std::cout << msg+"\n\n" << std::endl;
-                    printf("inside servermsg-disconnect\n");
-                    myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
+
+                    myDB.setIsActive(false);
                     myDB.setIsShouldTerminate(true);
                     handler.close(); //close the socket
-                    //resetKeyboard(); //reset keyboard listener method, prepare for next session:
+
                     std::cout << "Successful logout from Server!..\n" << std::endl;
                     break;
                 }
                 case subscribe: {
                     std::cout << msg+"\n\n" << std::endl;
-                    printf("inside servermsg-subscribe\n");
+
                     std::string myTopic = receipt_info.at(1);
                     myDB.add_to_myTopics(myTopic, stoi(receipt_info.at(2)));
 
@@ -205,10 +146,7 @@ void Protocol::process_server(std::string &msg) {
                       << msg << std::endl;
             myDB.setIsShouldTerminate(true);
             myDB.setIsActive(false);
-            //myDB.setWantLogout(true);
 
-            //refactoring keyboard listener:
-            //resetKeyboard();
 
             break;
         }
@@ -219,6 +157,7 @@ void Protocol::process_server(std::string &msg) {
     }
 
 }
+
 
 
 void Protocol::process_keyboard(std::string &msg) {
@@ -234,16 +173,16 @@ void Protocol::process_keyboard(std::string &msg) {
     //-----
 
     std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
-    if (vector_for_input.empty() ){printf("ERROR: invalid input\n");} //test purpose only
+    if (vector_for_input.empty() ){printf("ERROR: invalid input\n");}
     else{
         int actionName = getOpcode(vector_for_input.at(0)); //checks first word in input
         switch(actionName) {
             case LOGIN: {
-                //TODO: ALON 15.1 2130 new impl
+
                 send_stomp_frame("CONNECT", "accept-version:1.2 \n"
-                                                      "host:stomp.cs.bgu.ac.il \n"
-                                                      "login:"+vector_for_input.at(2)+"\n"
-                                                                      "passcode:" += vector_for_input.at(3));
+                                            "host:stomp.cs.bgu.ac.il \n"
+                                            "login:"+vector_for_input.at(2)+"\n"
+                                                                            "passcode:" += vector_for_input.at(3));
                 printf("Sent Connect frame to server\n");
 
 
@@ -273,18 +212,12 @@ void Protocol::process_keyboard(std::string &msg) {
                 break;
             }
             case ADD_BOOK: {
-                std::string bookName = unify_book_name(vector_for_input); //get unified by - book name //TODO: WHAT HAPPENS HERE?
-                std::string theTopic = vector_for_input.at(1); // the topic of the book
+                addBookCase(vector_for_input);
 
-                if(!myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
-                    myDB.add_topic_to_inv(theTopic);
-                }
-
-                myDB.add_book_to_Inv(bookName, theTopic);
-                send(vector_for_input.at(1), myDB.getMyName() + " has added the book " + bookName);
                 break;
             }
             case BORROW:{
+
                 if(vector_for_input.size()>2) {
                     std::string bookName = unify_book_name(vector_for_input);
                     myDB.add_book_to_wishList(bookName);
@@ -293,16 +226,7 @@ void Protocol::process_keyboard(std::string &msg) {
                 break;
             }
             case RETURN: {
-                if(vector_for_input.size()<3)
-                    std::cout << "invalid input from keyboard at return case\n" << std::endl;
-                else{
-                    myDB.remove_book_from_Inv(vector_for_input.at(2), vector_for_input.at(1)); //remove from my inv
-                    loaner_name = myDB.get_loaner_name(vector_for_input.at(2));
-                    if(loaner_name!="") {
-                        myDB.remove_from_borrowdMap(vector_for_input.at(2));//remove borrower from borrow map
-                        send(vector_for_input.at(1), "Returning " + vector_for_input.at(2) + " to " + loaner_name);
-                    }
-                }
+                returnCase(loaner_name, vector_for_input);
                 break;
             }
             case STATUS: {
@@ -331,6 +255,132 @@ void Protocol::process_keyboard(std::string &msg) {
 
 
 }
+
+void Protocol::returnCase(std::string &loaner_name, std::vector<std::string> &vector_for_input) {
+    if(vector_for_input.size() < 3)
+        std::cout << "invalid input from keyboard at return case\n" << std::endl;
+    else{
+        myDB.remove_book_from_Inv(vector_for_input.at(2), vector_for_input.at(1)); //remove from my inv
+        loaner_name = myDB.get_loaner_name(vector_for_input.at(2));
+        if(loaner_name!="") {
+            myDB.remove_from_borrowdMap(vector_for_input.at(2));//remove borrower from borrow map
+            send(vector_for_input.at(1), "Returning " + vector_for_input.at(2) + " to " + loaner_name);
+        }
+    }
+}
+
+void Protocol::addBookCase(std::vector<std::string> &vector_for_input) {
+    std::string bookName = unify_book_name(vector_for_input); //get unified by - book name
+    std::string theTopic = vector_for_input.at(1); // the topic of the book
+
+    if(!myDB.is_inv_contains_topic(theTopic)){ //put topic in inv if absent
+        myDB.add_topic_to_inv(theTopic);
+    }
+
+    myDB.add_book_to_Inv(bookName, theTopic);
+    send(vector_for_input.at(1), myDB.getMyName() + " has added the book " + bookName);
+}
+
+
+//private methods to make process clean and tidy:
+
+void Protocol::hasCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
+                       std::string &topic, std::string &other_name) {
+    if(parse_vec.at(2) == "added"){
+        std::cout << result.at(0) + '\n' + result.at(1) + '\n' + result.at(2) + '\n' + result.at(3) + "\n\n" +
+                     fix_body(result.at(5)) + '\n' + '\n' << std::endl;
+    }
+    else {
+        book = unify_book_name(parse_vec);
+
+        other_name = parse_vec.at(0);
+        if (myDB.getMyName() != other_name) { //act only if this isn't my message
+            boost::split(parse_vec, result.at(3), boost::is_any_of(
+                    ":")); //get topic
+            topic = parse_vec.at(1);
+            if (myDB.wishList_contains(book)) {
+                myDB.remove_book_from_wishList(book);
+                myDB.add_book_to_Inv(book, topic); //add the loaned book
+                myDB.add_book_to_borrowdMap(book, other_name);
+                //myDB.getBorrowedMap().insert(std::make_pair(book, other_name)); //add borrower to borrow map
+                send(topic, "Taking " + fix_body(book) + " from " + other_name);
+            }
+        }
+    }
+}
+
+void Protocol::wishCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
+                        std::string &topic) {
+    book = unify_book_name_borrow(parse_vec);//TODO: patch of the beyoker
+    boost::split(parse_vec, result.at(3), boost::is_any_of(":"));
+    topic = parse_vec.at(1);
+    if (myDB.inv_contains_book(book, topic)) {
+        send(topic, myDB.getMyName() + " has " + book); //if i have this book send has frame
+    }
+}
+
+void Protocol::returningCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
+                             std::string &topic) {
+    std::cout << result.at(0) + '\n' + result.at(1) + '\n' + result.at(2) + '\n' + result.at(3) + "\n\n" +
+                 fix_body(result.at(5)) + '\n' + '\n' << std::endl;
+
+    if (parse_vec.size() >= 4 &&
+        parse_vec.at(3) == myDB.getMyName()) { //if book is being returned to me
+        book = parse_vec.at(1);
+        boost::split(parse_vec, result.at(3), boost::is_any_of(
+                ":")); //get topic //TODO:check that this wont change book variable value
+        topic = parse_vec.at(1);
+        myDB.add_book_to_Inv(book, topic); //take book back to inv
+    }
+}
+
+void
+Protocol::bookstatusCase(const std::string &msg, std::vector<std::string> &result, std::vector<std::string> &parse_vec,
+                         std::vector<std::string> &books, std::string &topic, std::string &body) {
+    std::cout << msg + "\n\n" << std::endl;
+
+    body = myDB.getMyName() + ":";
+    boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
+    topic = parse_vec.at(1);
+    books = myDB.get_topic_books(topic);
+    for (int i=0;(unsigned)i<books.size();i++) {
+        body = body + fix_book_name(books.at(i)); // if it's not the last one
+        if((unsigned)i != books.size()-1)
+            body += ", ";
+    }
+
+    send(topic, body);//send frame
+}
+
+void Protocol::takingCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
+                          std::string &topic) {
+    std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
+    bool me = false; //is it my name
+
+    for (int i = 0; (unsigned) i < parse_vec.size() ; i++) {
+        if(parse_vec.at(i) == "from"){
+            me = (parse_vec.at(i+1) == myDB.getMyName());
+            break;
+        }
+    }
+
+    for(std::string st:parse_vec){
+        if(st == myDB.getMyName()){
+            me = true;
+            break;
+        }
+    }
+
+    if (me) { //need to give a book
+        book = unify_book_name_taking(parse_vec);
+        boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
+        topic = parse_vec.at(1);
+        if (myDB.remove_book_from_Inv(book, topic)) {
+            std::cout << "Borrowed " << fix_body(book) + "\n\n" << std::endl; //TODO: print for testing
+        }
+    }
+}
+
 
 void Protocol::remove_from_all_topics() {
     if(!myDB.getMyTopics().empty()) { //send exit to all genres subscribed
