@@ -105,7 +105,8 @@ void Protocol::process_server(std::string &msg) {
                     switch (param_result_3) {
                         case wish: {
                             std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
-                            book = parse_vec.at(4); //TODO:maybe move back to avoid double code
+
+                            book = unify_book_name_borrow(parse_vec);//TODO: patch of the beyoker
                             boost::split(parse_vec, result.at(3), boost::is_any_of(":"));
                             topic = parse_vec.at(1);
                             if (myDB.inv_contains_book(book, topic)) {
@@ -457,6 +458,13 @@ void Protocol::send_stomp_frame(std::string header, std::string body) {
 std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
     std::string output=vec.at(2);
     for(int i =3; i<vec.size();i++){
+        output = output +"-"+vec.at(i);
+    }
+    return output;
+}
+std::string Protocol::unify_book_name_borrow(std::vector<std::string> &vec) {
+    std::string output=vec.at(4);
+    for(int i =5; i<vec.size();i++){
         output = output +"-"+vec.at(i);
     }
     return output;
