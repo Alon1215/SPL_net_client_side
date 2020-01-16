@@ -19,6 +19,7 @@ private:
     int getOpcode(std::string st);
     std::string unify_book_name(std::vector<std::string> &vec);
     std::string unify_book_name_borrow(std::vector<std::string> &vec);
+    std::string unify_book_name_taking(std::vector<std::string> &vec);
     std::string fix_body(std::string &body);
     std::string fix_book_name(std::string book);
     void resetKeyboard();

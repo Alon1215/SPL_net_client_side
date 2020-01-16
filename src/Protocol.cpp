@@ -55,8 +55,15 @@ void Protocol::process_server(std::string &msg) {
             switch (param_result_2) {
                 case taking: {
                     std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
-                    if (parse_vec.at(3) == myDB.getMyName()) { //need to give a book
-                        book = parse_vec.at(1);
+                    bool me=false;
+                    for(std::string st:parse_vec){
+                        if(st==myDB.getMyName()){
+                            me=true;
+                            break;
+                        }
+                    }
+                    if (me) { //need to give a book
+                        book = unify_book_name_taking(parse_vec);
                         boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                         topic = parse_vec.at(1);
                         if (myDB.remove_book_from_Inv(book, topic)) {
@@ -119,7 +126,7 @@ void Protocol::process_server(std::string &msg) {
                                 std::cout<<result.at(0)+'\n'+result.at(1)+'\n'+result.at(2)+'\n'+result.at(3)+"\n\n"+fix_body(result.at(5))+'\n'+'\n'<<std::endl;
                             }
                             else {
-                                book = parse_vec.at(2); //TODO:maybe move back to avoid double code
+                                book = unify_book_name(parse_vec); //TODO:maybe move back to avoid double code
                                 printf("inside servermsg-has\n");
                                 other_name = parse_vec.at(0);
                                 if (myDB.getMyName() != other_name) { //act only if this isn't my message
@@ -465,6 +472,15 @@ std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
 std::string Protocol::unify_book_name_borrow(std::vector<std::string> &vec) {
     std::string output=vec.at(4);
     for(int i =5; i<vec.size();i++){
+        output = output +"-"+vec.at(i);
+    }
+    return output;
+}
+std::string Protocol::unify_book_name_taking(std::vector<std::string> &vec) {
+    std::string output=vec.at(1);
+    for(int i =2; i<vec.size();i++){
+        if(vec.at(i)=="from")
+            break;
         output = output +"-"+vec.at(i);
     }
     return output;
