@@ -13,7 +13,7 @@ void ServerListenerTask::operator()() {
     //while loop, processing until should be terminated:
 
     while(!db.getIsShouldTerminate1()){ //
-        printf("Server-Listener  task operating\n");
+
         std::string inMsg;
 
         //in case connectivity went wrong:

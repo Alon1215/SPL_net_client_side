@@ -108,7 +108,6 @@ void obtainParsedInput(std::string &input_string, std::vector<std::string> &vect
 
 void keyboardRunLoop(const ClientDB &clientDb, Protocol &aProtocol, std::string &input_string, bool &finishRun) {
     while(!clientDb.getIsShouldTerminate1()){
-        printf("Keyboard  task operating\n");
 
         getline(std::cin, input_string);
 
