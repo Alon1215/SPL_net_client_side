@@ -82,7 +82,7 @@ void Protocol::process_server(std::string &msg) {
                     books = myDB.get_topic_books(topic);
                     for (int i=0;(unsigned)i<books.size();i++) {
                         body = body + fix_book_name(books.at(i)); // if it's not the last one
-                        if(i != (unsigned)books.size()-1)
+                        if((unsigned)i != books.size()-1)
                             body += ", ";
                     }
 
