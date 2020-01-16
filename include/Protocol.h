@@ -22,6 +22,7 @@ private:
     std::string unify_book_name_taking(std::vector<std::string> &vec);
     std::string fix_body(std::string &body);
     std::string fix_book_name(std::string book);
+    std::string unify_book_name_returning(std::vector<std::string> &vec);
 
 public:
     Protocol(ClientDB &db, ConnectionHandler &handler);
