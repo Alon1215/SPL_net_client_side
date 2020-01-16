@@ -317,7 +317,7 @@ void Protocol::process_keyboard(std::string &msg) {
                 receipt_vec.push_back("DISCONNECT");
                 receiptId = myDB.getRecIdAndInc();
                 myDB.add_receipt(receiptId,receipt_vec);
-                send_stomp_frame( "DISCONNECT", "receipt:" + std::to_string(receiptId) + "\n\n");
+                send_stomp_frame( "DISCONNECT", "receipt:" + std::to_string(receiptId));
                 break;
             }
             default: { //TODO: should choose what to do in case invalid msg header recieved
