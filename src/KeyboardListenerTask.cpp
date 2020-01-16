@@ -11,7 +11,9 @@ void KeyboardListenerTask::operator()() {
         printf("Keyboard  task operating\n");
         std::string input_string;
         getline(std::cin, input_string);
-        if(input_string == "bye bye") { break;} //after logout, reset keyboard for next session //TODO: ALON 16.1 1330 change the string here & function
+        if(input_string == " ") {
+            printf("TEST LOGOUT - WORK!");
+            break;} //after logout, reset keyboard for next session //TODO: ALON 16.1 1330 change the string here & function
         if (!db.getIsActive()){
             printf("ERROR: not logged in yet!\n");  //TODO: should be in STOMP format?
         } else{

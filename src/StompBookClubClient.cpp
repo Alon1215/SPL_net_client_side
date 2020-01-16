@@ -22,7 +22,7 @@ int main () {
         if (!vector_for_input.empty() && vector_for_input.at(0) == "bye"){ break;} //exit program command
 
         while (vector_for_input.empty() || vector_for_input.at(0) != "login") {
-            printf("ERROR: user is not logged in yet \ntry again: \n");
+            printf("ERROR: user is not logged in yet \ninput message: %s \ntry again: \n",input_string.c_str());
             getline(std::cin, input_string);
             vector_for_input = Protocol::input_to_vector(input_string); //assistant method to parse the input to vector
         } //TODO: committed only to test something

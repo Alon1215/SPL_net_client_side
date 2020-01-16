@@ -6,7 +6,6 @@
 #include "../include/Protocol.h"
 #include "../include/connectionHandler.h"
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <boost/algorithm/string.hpp>
 
@@ -158,7 +157,7 @@ void Protocol::process_server(std::string &msg) {
                     myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
                     myDB.setIsShouldTerminate(true);
                     handler.close(); //close the socket
-                    resetKeyboard(); //reset keyboard listener method, prepare for next session:
+                    //resetKeyboard(); //reset keyboard listener method, prepare for next session:
                     std::cout << "Successful logout from Server!..\n" << std::endl;
                     break;
                 }
@@ -197,9 +196,10 @@ void Protocol::process_server(std::string &msg) {
                       << msg << std::endl;
             myDB.setIsShouldTerminate(true);
             myDB.setIsActive(false);
+            //myDB.setWantLogout(true);
 
             //refactoring keyboard listener:
-            resetKeyboard();
+            //resetKeyboard();
 
             break;
         }
@@ -488,8 +488,10 @@ std::string Protocol::fix_book_name(std::string book) {
 }
 
 void Protocol::resetKeyboard() {
-    std::istringstream resetString("bye bye");
+
+    std::istringstream resetString("bla bla bla");
     std::cin.rdbuf(resetString.rdbuf());
+
 }
 
 
