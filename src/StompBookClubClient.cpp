@@ -10,16 +10,19 @@
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 */
 int main () {
-    while (1) {
+    std::string input_string;
+    bool finishRun =false;
+
+    while (!finishRun) {
         printf("Welcome to the book club!\nstart by log in:\n");
 
 
         //handle the login (first command):
-        std::string input_string;
-        getline(std::cin, input_string);
-        std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
 
-        if (!vector_for_input.empty() && vector_for_input.at(0) == "bye"){ break;} //exit program command
+        if (input_string.empty()) //else - input already received (handle case after log out)
+            getline(std::cin, input_string);
+
+        std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
 
         while (vector_for_input.empty() || vector_for_input.at(0) != "login") {
             printf("ERROR: user is not logged in yet \ninput message: %s \ntry again: \n",input_string.c_str());
@@ -48,6 +51,10 @@ int main () {
         std::string password = vector_for_input.at(3);
 
 
+        //------------------------
+
+
+
         //creating connection with server:
         ConnectionHandler connectionHandler(host, port);
 
@@ -55,25 +62,45 @@ int main () {
         clientDb.setMyName(myName);
         Protocol aProtocol(clientDb,connectionHandler);
         if (!connectionHandler.connect()) {
-            printf("Could not connect to server\n");  //TODO: need to be replaced to stomp format!
+            printf("Could not connect to server\n");
         } else {
 
             ServerListenerTask serverListenerTask(connectionHandler, myName, clientDb,aProtocol);
-            KeyboardListenerTask keyBoardListenerTask(connectionHandler, myName, clientDb,aProtocol);
-            std::thread th1(std::ref(serverListenerTask)); //TODO: Check if ok
+            //KeyboardListenerTask keyBoardListenerTask(connectionHandler, myName, clientDb,aProtocol);
+            std::thread th1(std::ref(serverListenerTask));
 
             aProtocol.send_stomp_frame("CONNECT", "accept-version:1.2 \n"
                                       "host:stomp.cs.bgu.ac.il \n"
                                       "login:"+myName+"\n"
                                                       "passcode:" += password);
             printf("Sent Connect frame to server\n");
-            std::thread th2(std::ref(keyBoardListenerTask)); //TODO: Check if ok
+
+            //enters the keyboard listening loop:
+            while(!clientDb.getIsShouldTerminate1()){
+                printf("Keyboard  task operating\n");
+
+                getline(std::cin, input_string);
+
+                if(clientDb.getIsShouldTerminate1()) { //handle
+                    if (input_string == "bye") {
+                        finishRun = true;
+                        printf("Client is out, see you next time!");
+                    }
+                    break;
+                }
+
+                if (!clientDb.getIsActive()){
+                    printf("ERROR: not logged in yet!\n");  //TODO: should be in STOMP format?
+                } else{
+                    aProtocol.process_keyboard(input_string);
+                }
+
+            }
 
 
 
             //now client is up and running. waits until logged out:
             th1.join();
-            th2.join();
         }
 
 
