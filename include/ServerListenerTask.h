@@ -13,9 +13,11 @@
 class ServerListenerTask {
 private:
     ConnectionHandler& handler;
-    Protocol& protocol;
-    ClientDB& db;
     std::string name;
+    ClientDB& db;
+    Protocol& protocol;
+
+
 public:
     ServerListenerTask(ConnectionHandler &handler, std::string name,ClientDB& db,Protocol &protocol);
     void operator()();

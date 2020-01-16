@@ -14,22 +14,20 @@
 
 class Protocol {
 private:
-    ConnectionHandler& handler;
     ClientDB& myDB;
+    ConnectionHandler& handler;
     int getOpcode(std::string st);
     std::string unify_book_name(std::vector<std::string> &vec);
     std::string unify_book_name_borrow(std::vector<std::string> &vec);
     std::string unify_book_name_taking(std::vector<std::string> &vec);
     std::string fix_body(std::string &body);
     std::string fix_book_name(std::string book);
-    void resetKeyboard();
 
 public:
-    std::condition_variable &getLogoutCondition() ;
     Protocol(ClientDB &db, ConnectionHandler &handler);
     void process_server(std::string &msg);
     void process_keyboard(std::string &msg);
-    static std::vector<std::string> input_to_vector(const std::string& str, char delimiter);
+    //static std::vector<std::string> input_to_vector(const std::string& str, char delimiter); TODO:clion says never userd
     static std::vector<std::string> input_to_vector(const std::string& str);
     void send(std::string topic,std::string body);
     void send_stomp_frame (std::string header, std::string body);

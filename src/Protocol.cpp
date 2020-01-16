@@ -80,9 +80,9 @@ void Protocol::process_server(std::string &msg) {
                     boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
                     topic = parse_vec.at(1);
                     books = myDB.get_topic_books(topic);
-                    for (int i=0;i<books.size();i++) {
+                    for (int i=0;(unsigned)i<books.size();i++) {
                         body = body + fix_book_name(books.at(i)); // if it's not the last one
-                        if(i != books.size()-1)
+                        if(i != (unsigned)books.size()-1)
                             body += ", ";
                     }
 
@@ -358,25 +358,25 @@ void Protocol::handleExit(int subID, const std::string &topicName) {
 }
 
 
-std::vector<std::string> Protocol::input_to_vector(const std::string &str, char delimiter) {
-    std::string word = "";
-    std::vector<std::string> output;
-    for (auto x : str)
-    {
-        if (x == delimiter)
-        {
-            std::string newWord = word;
-            output.push_back(word);
-            word = "";
-        }
-        else
-        {
-            word = word + x;
-        }
-    }
-    output.push_back(word);
-    return output;
-}
+//std::vector<std::string> Protocol::input_to_vector(const std::string &str, char delimiter) { TODO:never used probably should del
+//    std::string word = "";
+//    std::vector<std::string> output;
+//    for (auto x : str)
+//    {
+//        if (x == delimiter)
+//        {
+//            std::string newWord = word;
+//            output.push_back(word);
+//            word = "";
+//        }
+//        else
+//        {
+//            word = word + x;
+//        }
+//    }
+//    output.push_back(word);
+//    return output;
+//}
 
 
 std::vector<std::string> Protocol::input_to_vector(const std::string &str) {
@@ -464,21 +464,21 @@ void Protocol::send_stomp_frame(std::string header, std::string body) {
 
 std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
     std::string output=vec.at(2);
-    for(int i =3; i<vec.size();i++){
+    for(int i =3; (unsigned)i<vec.size();i++){
         output = output +"-"+vec.at(i);
     }
     return output;
 }
 std::string Protocol::unify_book_name_borrow(std::vector<std::string> &vec) {
     std::string output=vec.at(4);
-    for(int i =5; i<vec.size();i++){
+    for(int i =5; (unsigned)i<vec.size();i++){
         output = output +"-"+vec.at(i);
     }
     return output;
 }
 std::string Protocol::unify_book_name_taking(std::vector<std::string> &vec) {
     std::string output=vec.at(1);
-    for(int i =2; i<vec.size();i++){
+    for(int i =2; (unsigned)i<vec.size();i++){
         if(vec.at(i)=="from")
             break;
         output = output +"-"+vec.at(i);
@@ -513,14 +513,6 @@ std::string Protocol::fix_book_name(std::string book) {
     }
     return fixed_book;
 }
-
-void Protocol::resetKeyboard() {
-
-    std::istringstream resetString("bla bla bla");
-    std::cin.rdbuf(resetString.rdbuf());
-
-}
-
 
 
 

@@ -21,13 +21,6 @@ ClientDB::ClientDB(): myTopics(), wishList(), myInventory(), borrowedMap(), rece
         ClientDB::isActive = isActive;
     }
 
-    const std::vector<std::string> &ClientDB::getGetBooksOfTopic() const {
-        return getBooksOfTopic;
-    }
-
-    void ClientDB::setGetBooksOfTopic(const std::vector<std::string> &getBooksOfTopic) {
-        ClientDB::getBooksOfTopic = getBooksOfTopic;
-    }
 
     const std::string &ClientDB::getMyName() const {
         return myName;

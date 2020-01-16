@@ -31,6 +31,7 @@ private:
     int receiptNumCounter; //this will be a unique number of each receipt
     int subscriptionId;
     bool wantLogout;
+
     //lockers
     std::mutex wish_lock;
     std::mutex inv_lock;
@@ -56,10 +57,6 @@ public:
 
 
     bool getIsActive() const;
-
-    const std::vector<std::string> &getGetBooksOfTopic() const;
-
-    void setGetBooksOfTopic(const std::vector<std::string> &getBooksOfTopic);
 
     const std::string &getMyName() const;
 
