@@ -205,7 +205,7 @@ void ClientDB::add_topic_to_inv(std::string topic) {
 
 // -----------------
 
-void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {
+void ClientDB::setIsShouldTerminate(bool isShouldTerminate) {//set should terminate
     ClientDB::isShouldTerminate = isShouldTerminate;
 }
 
