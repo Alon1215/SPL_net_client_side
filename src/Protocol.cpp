@@ -58,7 +58,7 @@ void Protocol::process_server(std::string &msg) {
                     bool me=false;
                     for(std::string st:parse_vec){
                         if(st==myDB.getMyName()){
-                            me=true;
+                            me = true;
                             break;
                         }
                     }
