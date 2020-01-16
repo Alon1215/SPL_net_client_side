@@ -83,7 +83,7 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
 		{
 			return false;
 		}
-		if(ch!='\0') //TODO:ofer: checking if fucked us
+		if(ch!='\0')
 			frame.append(1, ch);
 
 	}

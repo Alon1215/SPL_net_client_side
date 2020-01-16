@@ -76,7 +76,7 @@ bool ClientDB::remove_book_from_Inv(std::string book,std::string topic) {
     std::vector<std::string> &books = myInventory.at(topic);
     for(int i=0;i< (signed) books.size();i++){
         if(book==books.at(i)){
-            books.erase(books.begin()+i); //TODO: hope this works
+            books.erase(books.begin()+i);
             return true;
         }
     }
@@ -93,7 +93,7 @@ bool ClientDB::remove_book_from_wishList(std::string book) {;
 
     for(int i=0;i< (signed) wishList.size();i++){
         if(book==wishList.at(i)){
-            wishList.erase(wishList.begin()+i); //TODO: hope this works
+            wishList.erase(wishList.begin()+i);
             return true;
         }
     }
@@ -143,7 +143,7 @@ std::string ClientDB::get_loaner_name(std::string book) {
 
 void ClientDB::add_receipt(int receiptID, std::vector<std::string> reciptInfo) {
     std::lock_guard<std::mutex> lock(receipt_lock); //lock sending
-    //TODO:problem here with adding with correct key
+
     receiptMap.insert(std::make_pair(receiptID, reciptInfo));
 
 }
@@ -192,7 +192,7 @@ bool ClientDB::is_inv_contains_topic(std::string topic) {
 
 void ClientDB::add_topic_to_inv(std::string topic) {
     std::lock_guard<std::mutex> lock(inv_lock); //lock sending
-    myInventory.insert(std::make_pair(topic, std::vector<std::string>())); //TODO: ALON 14.1 1530 need to fix
+    myInventory.insert(std::make_pair(topic, std::vector<std::string>()));
 }
 
 

@@ -34,7 +34,7 @@ int main () {
             printf("ERROR: user is not logged in yet \ninput message: %s \ntry again: \n",input_string.c_str());
             getline(std::cin, input_string);
             vector_for_input = Protocol::input_to_vector(input_string); //assistant method to parse the input to vector
-        } //TODO: committed only to test something
+        }
 
 
         //at this point, a login command is received:
@@ -68,7 +68,7 @@ int main () {
                                       "host:stomp.cs.bgu.ac.il \n"
                                       "login:"+myName+"\n"
                                                       "passcode:" += password);
-            printf("Sent Connect frame to server\n"); //TODO: for us, should be deleted
+            printf("Sent Connect frame to server\n");
 
             //enters the keyboard listening loop:
             keyboardRunLoop(clientDb, aProtocol, input_string, finishRun);
@@ -100,9 +100,9 @@ int main () {
 }
 
 void obtainParsedInput(std::string &input_string, std::vector<std::string> &vector_for_input) {
-    vector_for_input= Protocol::input_to_vector(input_string);
     if (input_string.empty()) //else - input already received (handle case after log out)
         getline(std::cin, input_string);//ass method to parse the input
+    vector_for_input= Protocol::input_to_vector(input_string);
 
 }
 
@@ -121,7 +121,7 @@ void keyboardRunLoop(const ClientDB &clientDb, Protocol &aProtocol, std::string 
         }
 
         if (!clientDb.getIsActive()){
-            printf("ERROR: not logged in yet!\n");  //TODO: should be in STOMP format?
+            printf("ERROR: not logged in yet!\n");
         } else{
             aProtocol.process_keyboard(input_string);
         }

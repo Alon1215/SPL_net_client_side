@@ -9,7 +9,6 @@ using boost::asio::ip::tcp;
 
 ServerListenerTask::ServerListenerTask(ConnectionHandler &handler, std::string name,ClientDB &db,Protocol &protocol):handler(handler),name(name),db(db),protocol(protocol) {}
 void ServerListenerTask::operator()() {
-    printf("inside Server-Listener:\n\n"); //TODO: for us, should be deleted
 
     //while loop, processing until should be terminated:
 

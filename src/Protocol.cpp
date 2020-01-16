@@ -22,7 +22,6 @@ void Protocol::process_server(std::string &msg) {
 
     //variables to be used by cases, in order to process msg from server:
     //-----
-    printf("inside proccess server\n");
     std::vector<std::string> result; //vector of all lines in input msg
     std::vector<std::string> parse_vec;
     std::vector<std::string> receipt_info;
@@ -48,7 +47,7 @@ void Protocol::process_server(std::string &msg) {
             break;
         }
         case message: {
-            printf("inside servermsg-message\n");
+
             boost::split(parse_vec, result.at(5), boost::is_any_of(" ")); //split message body into words
             param_result_2 = getOpcode(parse_vec.at(0)); //get first word code
             switch (param_result_2) {
@@ -150,7 +149,7 @@ void Protocol::process_server(std::string &msg) {
 
             break;
         }
-        default: { //TODO: should choose what to do in case invalid msg header recieved
+        default: {
 
             break;
         }
@@ -175,6 +174,7 @@ void Protocol::process_keyboard(std::string &msg) {
     std::vector<std::string> vector_for_input = Protocol::input_to_vector(msg); //ass method to parse the input
     if (vector_for_input.empty() ){printf("ERROR: invalid input\n");}
     else{
+        //map the case & handle it
         int actionName = getOpcode(vector_for_input.at(0)); //checks first word in input
         switch(actionName) {
             case LOGIN: {
@@ -196,6 +196,7 @@ void Protocol::process_keyboard(std::string &msg) {
                 tmpVector.push_back("SUBSCRIBE");
                 tmpVector.push_back(vector_for_input.at(1));
                 tmpVector.push_back(std::to_string(subID));
+
                 //insert to maps:
                 myDB.add_receipt(receiptId, tmpVector);
 
@@ -244,8 +245,8 @@ void Protocol::process_keyboard(std::string &msg) {
                 send_stomp_frame( "DISCONNECT", "receipt:" + std::to_string(receiptId));
                 break;
             }
-            default: { //TODO: should choose what to do in case invalid msg header recieved
-                printf("invalid keyboard input,try again stupid\n");
+            default: {
+                printf("invalid keyboard input,try again:\n");
                 break;
             }
         }
@@ -255,6 +256,8 @@ void Protocol::process_keyboard(std::string &msg) {
 
 
 }
+
+//private methods to make process clean and tidy:
 
 void Protocol::returnCase(std::string &loaner_name, std::vector<std::string> &vector_for_input) {
     if(vector_for_input.size() < 3)
@@ -281,9 +284,6 @@ void Protocol::addBookCase(std::vector<std::string> &vector_for_input) {
     send(vector_for_input.at(1), myDB.getMyName() + " has added the book " + bookName);
 }
 
-
-//private methods to make process clean and tidy:
-
 void Protocol::hasCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
                        std::string &topic, std::string &other_name) {
     if(parse_vec.at(2) == "added"){
@@ -298,11 +298,12 @@ void Protocol::hasCase(std::vector<std::string> &result, std::vector<std::string
             boost::split(parse_vec, result.at(3), boost::is_any_of(
                     ":")); //get topic
             topic = parse_vec.at(1);
+
             if (myDB.wishList_contains(book)) {
                 myDB.remove_book_from_wishList(book);
                 myDB.add_book_to_Inv(book, topic); //add the loaned book
                 myDB.add_book_to_borrowdMap(book, other_name);
-                //myDB.getBorrowedMap().insert(std::make_pair(book, other_name)); //add borrower to borrow map
+
                 send(topic, "Taking " + fix_body(book) + " from " + other_name);
             }
         }
@@ -311,7 +312,7 @@ void Protocol::hasCase(std::vector<std::string> &result, std::vector<std::string
 
 void Protocol::wishCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
                         std::string &topic) {
-    book = unify_book_name_borrow(parse_vec);//TODO: patch of the beyoker
+    book = unify_book_name_borrow(parse_vec);
     boost::split(parse_vec, result.at(3), boost::is_any_of(":"));
     topic = parse_vec.at(1);
     if (myDB.inv_contains_book(book, topic)) {
@@ -328,7 +329,7 @@ void Protocol::returningCase(std::vector<std::string> &result, std::vector<std::
         parse_vec.at(3) == myDB.getMyName()) { //if book is being returned to me
         book = parse_vec.at(1);
         boost::split(parse_vec, result.at(3), boost::is_any_of(
-                ":")); //get topic //TODO:check that this wont change book variable value
+                ":")); //get topic
         topic = parse_vec.at(1);
         myDB.add_book_to_Inv(book, topic); //take book back to inv
     }
@@ -376,7 +377,7 @@ void Protocol::takingCase(std::vector<std::string> &result, std::vector<std::str
         boost::split(parse_vec, result.at(3), boost::is_any_of(":")); //get topic
         topic = parse_vec.at(1);
         if (myDB.remove_book_from_Inv(book, topic)) {
-            std::cout << "Borrowed " << fix_body(book) + "\n\n" << std::endl; //TODO: print for testing
+            std::cout << "Borrowed " << fix_body(book) + "\n\n" << std::endl;
         }
     }
 }
@@ -389,9 +390,9 @@ void Protocol::remove_from_all_topics() {
         for (std::pair<std::string, int> p:myDB.getMyTopics()) {
             handleExit(p.second, p.first);
         }
-        //while () TODO: ALON 1340 implent the while loop (I know it is waked once)
+
         myDB.getCv().wait(lck);
-        lck.release(); //TODO: might throw error if not owned anymore
+        lck.release();
     }
 }
 
@@ -406,28 +407,6 @@ void Protocol::handleExit(int subID, const std::string &topicName) {
     send_stomp_frame("UNSUBSCRIBE",
                      "id:" + std::to_string(subID) + "\nreceipt:" + std::to_string(receiptId));
 }
-
-
-//std::vector<std::string> Protocol::input_to_vector(const std::string &str, char delimiter) { TODO:never used probably should del
-//    std::string word = "";
-//    std::vector<std::string> output;
-//    for (auto x : str)
-//    {
-//        if (x == delimiter)
-//        {
-//            std::string newWord = word;
-//            output.push_back(word);
-//            word = "";
-//        }
-//        else
-//        {
-//            word = word + x;
-//        }
-//    }
-//    output.push_back(word);
-//    return output;
-//}
-
 
 std::vector<std::string> Protocol::input_to_vector(const std::string &str) {
     std::string word = "";
@@ -507,11 +486,6 @@ void Protocol::send_stomp_frame(std::string header, std::string body) {
     handler.sendLine(toSend);
 }
 
-
-
-
-
-
 std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
     std::string output=vec.at(2);
     for(int i =3; (unsigned)i<vec.size();i++){
@@ -535,12 +509,6 @@ std::string Protocol::unify_book_name_taking(std::vector<std::string> &vec) {
     }
     return output;
 }
-//std::string Protocol::unify_book_name_borrow(std::vector<std::string> &vec) {
-//    //std::string output = vec.at()
-//}
-
-
-
 
 std::string Protocol::fix_body(std::string &body) {
     std::string toPrint;

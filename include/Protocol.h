@@ -27,7 +27,6 @@ public:
     Protocol(ClientDB &db, ConnectionHandler &handler);
     void process_server(std::string &msg);
     void process_keyboard(std::string &msg);
-    //static std::vector<std::string> input_to_vector(const std::string& str, char delimiter); TODO:clion says never userd
     static std::vector<std::string> input_to_vector(const std::string& str);
     void send(std::string topic,std::string body);
     void send_stomp_frame (std::string header, std::string body);
