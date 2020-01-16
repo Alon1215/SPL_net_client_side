@@ -54,7 +54,6 @@ public:
 
     void setIsActive(bool isActive);
 
-    std::vector<std::string> getBooksOfTopic;
 
     bool getIsActive() const;
 
