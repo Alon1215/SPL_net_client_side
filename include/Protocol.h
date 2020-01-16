@@ -21,6 +21,7 @@ private:
 //    std::string unify_book_name_borrow(std::vector<std::string> &vec);
     std::string fix_body(std::string &body);
     std::string fix_book_name(std::string book);
+    void resetKeyboard();
 
 public:
     std::condition_variable &getLogoutCondition() ;
@@ -31,8 +32,9 @@ public:
     static std::vector<std::string> input_to_vector(const std::string& str);
     void send(std::string topic,std::string body);
     void send_stomp_frame (std::string header, std::string body);
-
     void handleExit(int subID, const std::string &topicName);
+
+    void remove_from_all_topics();
 };
 
 

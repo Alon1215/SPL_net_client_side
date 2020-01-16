@@ -7,27 +7,16 @@ KeyboardListenerTask::KeyboardListenerTask(ConnectionHandler &handler, std::stri
 
 void KeyboardListenerTask::operator()() {
 
-    //aProtocol.send("CONNECT", "version:1.2\n\n^@"); //TODO: check if ^@ or \0
     while(!db.getIsShouldTerminate1()){ //TODO: change to bool in db
         printf("Keyboard  task operating\n");
         std::string input_string;
         getline(std::cin, input_string);
+        if(input_string == "bye bye") { break;} //after logout, reset keyboard for next session //TODO: ALON 16.1 1330 change the string here & function
         if (!db.getIsActive()){
             printf("ERROR: not logged in yet!\n");  //TODO: should be in STOMP format?
-        }
-
-        else{
+        } else{
             protocol.process_keyboard(input_string);
         }
-
-//
-//        std::vector<std::string> vector_for_input = Protocol::input_to_vector(input_string); //ass method to parse the input
-//        if (vector_for_input.size() != 0 ){printf("ERROR: invalid input\n");} //test purpose only
-//        else{
-//            aProtocol.process_keyboard(input_string)
-//
-//        }
-
 
     }
 

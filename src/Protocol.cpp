@@ -5,8 +5,9 @@
 #include <boost/asio/ip/tcp.hpp>
 #include "../include/Protocol.h"
 #include "../include/connectionHandler.h"
-#include <bits/stdc++.h>
-#include <bits/stdc++.h>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <boost/algorithm/string.hpp>
 
 enum string_code{
@@ -157,6 +158,7 @@ void Protocol::process_server(std::string &msg) {
                     myDB.setIsActive(false); //TODO:ofer: check if valid change (here is where we close socket!)
                     myDB.setIsShouldTerminate(true);
                     handler.close(); //close the socket
+                    resetKeyboard(); //reset keyboard listener method, prepare for next session:
                     std::cout << "Successful logout from Server!..\n" << std::endl;
                     break;
                 }
@@ -195,6 +197,10 @@ void Protocol::process_server(std::string &msg) {
                       << msg << std::endl;
             myDB.setIsShouldTerminate(true);
             myDB.setIsActive(false);
+
+            //refactoring keyboard listener:
+            resetKeyboard();
+
             break;
         }
         default: { //TODO: should choose what to do in case invalid msg header recieved
@@ -293,13 +299,9 @@ void Protocol::process_keyboard(std::string &msg) {
                 break;
             }
             case LOGOUT: {
-                myDB.setWantLogout(true);
-                std::unique_lock<std::mutex> lck(myDB.getTopicLock());
-                for(std::pair<std::string,int> p:myDB.getMyTopics()){
-                    handleExit(p.second,p.first);
-                }
-                myDB.getCv().wait(lck);
-                lck.release(); //TODO: might throw error if not owned anymore
+
+                remove_from_all_topics(); // unsubscribe from all topics if necessary
+
                 std::vector<std::string> receipt_vec;
                 receipt_vec.push_back("DISCONNECT");
                 receiptId = myDB.getRecIdAndInc();
@@ -317,6 +319,19 @@ void Protocol::process_keyboard(std::string &msg) {
     }
 
 
+}
+
+void Protocol::remove_from_all_topics() {
+    if(!myDB.getMyTopics().empty()) { //send exit to all genres subscribed
+        myDB.setWantLogout(true);
+        std::unique_lock<std::mutex> lck(myDB.getTopicLock());
+        for (std::pair<std::string, int> p:myDB.getMyTopics()) {
+            handleExit(p.second, p.first);
+        }
+        //while () TODO: ALON 1340 implent the while loop (I know it is waked once)
+        myDB.getCv().wait(lck);
+        lck.release(); //TODO: might throw error if not owned anymore
+    }
 }
 
 void Protocol::handleExit(int subID, const std::string &topicName) {
@@ -471,6 +486,12 @@ std::string Protocol::fix_book_name(std::string book) {
     }
     return fixed_book;
 }
+
+void Protocol::resetKeyboard() {
+    std::istringstream resetString("bye bye");
+    std::cin.rdbuf(resetString.rdbuf());
+}
+
 
 
 
