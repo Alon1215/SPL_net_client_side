@@ -287,13 +287,10 @@ void Protocol::addBookCase(std::vector<std::string> &vector_for_input) {
 
 void Protocol::hasCase(std::vector<std::string> &result, std::vector<std::string> &parse_vec, std::string &book,
                        std::string &topic, std::string &other_name) {
-    if(parse_vec.at(2) == "added"){
-        std::cout << result.at(0) + '\n' + result.at(1) + '\n' + result.at(2) + '\n' + result.at(3) + "\n\n" +
-                     fix_body(result.at(5)) + '\n' + '\n' << std::endl;
-    }
-    else {
+    std::cout << result.at(0) + '\n' + result.at(1) + '\n' + result.at(2) + '\n' + result.at(3) + "\n\n" +
+                 fix_body(result.at(5)) + '\n' + '\n' << std::endl;
+    if(parse_vec.at(2) != "added") {
         book = unify_book_name(parse_vec);
-
         other_name = parse_vec.at(0);
         if (myDB.getMyName() != other_name) { //act only if this isn't my message
             boost::split(parse_vec, result.at(3), boost::is_any_of(
@@ -496,10 +493,13 @@ std::string Protocol::unify_book_name(std::vector<std::string> &vec) {
     return output;
 }
 std::string Protocol::unify_book_name_borrow(std::vector<std::string> &vec) {
-    std::string output=vec.at(4);
-    for(int i =5; (unsigned)i<vec.size();i++){
-        output = output +"-"+vec.at(i);
+    if (vec.size() <5)
+        return "";
+    std::string output = vec.at(4);
+    for (int i = 5; (unsigned) i < vec.size(); i++) {
+        output = output + "-" + vec.at(i);
     }
+
     return output;
 }
 std::string Protocol::unify_book_name_taking(std::vector<std::string> &vec) {
